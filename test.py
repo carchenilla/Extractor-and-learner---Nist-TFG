@@ -1,5 +1,9 @@
-from bs4 import BeautifulSoup
-from urllib.request import Request, urlopen
-import requests
+from VulnDictionary import VulnDictionary
 
-r = requests.get('https://nvd.nist.gov/download/nvdcve-2010.meta')
+
+if __name__ == "__main__":
+    mydict = VulnDictionary(2010)
+    print(mydict.isUpdated())
+    mydict.update()
+    print()
+    print(mydict.isUpdated())
