@@ -1,14 +1,14 @@
-from bs4 import BeautifulSoup       #BeautifulSoup
-from urllib.request import Request,urlopen  #to open urls
+import xml.etree.ElementTree as ET
+import zipfile
 
-if __name__ == "__main__":
-    req = Request("https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-9798")
-    #req.add_header('User-Agent','Magic Browser')    #headers for scraping
-    content = urlopen(req)
-    scrapper = BeautifulSoup(content.read(), "lxml")  # open html with lxml
-    for tag in scrapper.find_all("span"):
-        try:
-            if tag.string=="Impact Score:":
-                print(tag.parent.contents[-1].strip())
-        except KeyError as err:
-            pass
+name = "nvdcve-2007.xml.zip"
+zipfile.ZipFile(name).extractall()
+
+tree = ET.parse(name[:-4])
+root = tree.getroot()
+
+
+for i in range(3):
+    print(root[i].attrib)
+    print(root[i][0][0].text)
+    print()
