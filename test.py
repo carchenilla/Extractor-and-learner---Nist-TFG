@@ -11,4 +11,5 @@ root = tree.getroot()
 for i in range(3):
     print(root[i].attrib)
     print(root[i][0][0].text)
+    print("Name: "+root[i].attrib['name'])
     print()
