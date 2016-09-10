@@ -4,6 +4,7 @@ import zipfile
 from urllib.request import urlopen, urlretrieve
 import os
 from Vulnerabilty import Vulnerability
+from Software import Software
 
 ACCESS_VECTOR = {'L':'Local access', 'A': 'Adjacent Network', 'N': 'Network'}
 ACCESS_COMPLEXITY = {'H':'High', 'M':'Medium', 'L':'Low'}
@@ -52,15 +53,23 @@ class VulnDictionary:
                         exp_score = float(child.attrib['CVSS_exploit_subscore'])
                         vect = self.extract_vector(child.attrib['CVSS_vector'])
                         descr = child[0][0].text
+                        try:
+                            soft_list = self.extract_software(child[4])
+                        except IndexError as err:
+                            print("\nError with vulnerability "+vname)
+                            print("No software list found \n")
+                            soft_list = []
                         self.dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]), int(pub_date[2])),
                                                         datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])),
-                                                        sev, score, bas_score, imp_score, exp_score, vect, descr)
+                                                        sev, score, bas_score, imp_score, exp_score, vect, descr, soft_list)
                         #print("Name: "+vname+"\n Description: "+descr)
                         print("Saved vulnerability: "+vname)
                 except KeyError:
                     print("There's a problem with vulnerability "+child.attrib['name'])
             os.remove(name[:-4])
             self.set_last_mod_today()
+        else:
+            print(str(self.year)+" dictionary is already updated")
 
 
     def extract_vector(self, initialVector):
@@ -69,3 +78,16 @@ class VulnDictionary:
         for i in range(len(new_vector)):
             final_vector.append(FEATURES_LIST[i][new_vector[i][-1]])
         return final_vector
+
+    def extract_software(self, vuln_soft):
+        software_list = []
+        for i in range(len(vuln_soft)):
+            version_list = []
+            for j in range(len(vuln_soft[i])):
+                ver = vuln_soft[i][j].get('num')
+                ed = vuln_soft[i][j].get('edition')
+                if ed != None:
+                    ver = ver + " " + ed
+                version_list.append(ver)
+            software_list.append(Software(vuln_soft[i].get('name'), vuln_soft[i].get('vendor'), version_list))
+        return software_list

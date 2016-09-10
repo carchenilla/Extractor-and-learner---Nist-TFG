@@ -1,5 +1,6 @@
 class Vulnerability():
-    def __init__(self, name, published, modified, severity, score, base_score, imp_score, exp_score, vector, description):
+    def __init__(self, name, published, modified, severity, score, base_score, imp_score, exp_score, vector, description,
+                 soft_list):
         self.name = name
         self.published = published
         self.modified = modified
@@ -10,6 +11,7 @@ class Vulnerability():
         self.exp_score = exp_score
         self.vector = vector
         self.description = description
+        self.soft_list = soft_list
 
     def to_string(self):
         return "Vulnerability: "+self.name+". Published on "+self.published+". \n"+"Score: "+self.score+". Vector: "\
