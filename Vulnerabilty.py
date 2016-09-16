@@ -14,5 +14,5 @@ class Vulnerability():
         self.soft_list = soft_list
 
     def to_string(self):
-        return "Vulnerability: "+self.name+". Published on "+self.published+". \n"+"Score: "+self.score+". Vector: "\
-               +self.vector+"\n"+self.description
+        return "Vulnerability: "+self.name+". Published on "+str(self.published)+". \n"+"Score: "+str(self.score)+". Vector: "\
+               +str(self.vector)+"\n"+self.description

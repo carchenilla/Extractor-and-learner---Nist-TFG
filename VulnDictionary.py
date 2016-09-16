@@ -68,8 +68,11 @@ class VulnDictionary:
                     print("There's a problem with vulnerability "+child.attrib['name'])
             os.remove(name[:-4])
             self.set_last_mod_today()
+            print(str(self.year) + " dictionary updated")
+            return 1
         else:
             print(str(self.year)+" dictionary is already updated")
+            return 0
 
 
     def extract_vector(self, initialVector):
@@ -91,3 +94,9 @@ class VulnDictionary:
                 version_list.append(ver)
             software_list.append(Software(vuln_soft[i].get('name'), vuln_soft[i].get('vendor'), version_list))
         return software_list
+
+    def to_string(self):
+        res = "Vulnerabilities from year "+str(self.year)+":\n"
+        for v in self.dict.values():
+            res = res + v.to_string()+"\n"
+        return res+"\n"
