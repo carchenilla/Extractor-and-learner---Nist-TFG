@@ -1,5 +1,5 @@
-from VulnDictionary import VulnDictionary
 import pickle
+from extractor.VulnDictionary import VulnDictionary
 
 if __name__ == "__main__":
     count = 0
@@ -9,7 +9,7 @@ if __name__ == "__main__":
         myDic.update()
         print(myDic.is_updated())
         print()
-        with open("VulnDictionary_"+str(i)+".p",'wb') as f:
+        with open("dictionaries/VulnDictionary_"+str(i)+".p",'wb') as f:
             pickle.dump(myDic, f)
         count = count + len(myDic.dict.keys())
     print("Total: "+str(count))

@@ -1,19 +1,36 @@
 import datetime
+import os
 import xml.etree.ElementTree as ET
 import zipfile
 from urllib.request import urlopen, urlretrieve
-import os
-from Vulnerabilty import Vulnerability
-from Software import Software
+from extractor.Vulnerabilty import Vulnerability
+from extractor.Software import Software
+from numpy import array
 
-ACCESS_VECTOR = {'L':'Local access', 'A': 'Adjacent Network', 'N': 'Network'}
-ACCESS_COMPLEXITY = {'H':'High', 'M':'Medium', 'L':'Low'}
-AUTHENTIFICATION = {'N':'None required', 'S':'Requires single instance', 'M':'Requires multiple instances'}
-CONF_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
-INTEG_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
-AVAIL_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
+
+#ACCESS_VECTOR = {'L':'Local access', 'A': 'Adjacent Network', 'N': 'Network'}
+ACCESS_VECTOR = {'L':0, 'A': 1, 'N': 2}
+
+#ACCESS_COMPLEXITY = {'H':'High', 'M':'Medium', 'L':'Low'}
+ACCESS_COMPLEXITY = {'H':2, 'M':1, 'L':0}
+
+#AUTHENTIFICATION = {'N':'None required', 'S':'Requires single instance', 'M':'Requires multiple instances'}
+AUTHENTIFICATION = {'N':0, 'S':1, 'M':2}
+
+#CONF_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
+CONF_IMPACT = {'N':0, 'P':1, 'C':2}
+
+#INTEG_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
+INTEG_IMPACT = {'N':0, 'P':1, 'C':2}
+
+#AVAIL_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
+AVAIL_IMPACT = {'N':0, 'P':1, 'C':2}
+
+SEVERITY = {'Low':0, 'Medium':1, 'High':2}
+
 
 FEATURES_LIST = [ACCESS_VECTOR, ACCESS_COMPLEXITY, AUTHENTIFICATION, CONF_IMPACT, INTEG_IMPACT, AVAIL_IMPACT]
+
 
 
 class VulnDictionary:
@@ -46,12 +63,14 @@ class VulnDictionary:
                         vname = child.attrib['name']
                         pub_date = child.attrib['published'].split('-')
                         mod_date = child.attrib['modified'].split('-')
-                        sev = str(child.attrib['severity'])
+                        sev = SEVERITY.get(str(child.attrib['severity']))
                         score = float(child.attrib['CVSS_score'])
                         bas_score = float(child.attrib['CVSS_base_score'])
                         imp_score = float(child.attrib['CVSS_impact_subscore'])
                         exp_score = float(child.attrib['CVSS_exploit_subscore'])
-                        vect = self.extract_vector(child.attrib['CVSS_vector'])
+                        # vect = self.extract_vector(child.attrib['CVSS_vector'])
+                        vect = [bas_score, imp_score, exp_score, sev]
+                        vect. extend(self.extract_vector(child.attrib['CVSS_vector']))
                         descr = child[0][0].text
                         try:
                             soft_list = self.extract_software(child[4])
@@ -59,10 +78,12 @@ class VulnDictionary:
                             print("\nError with vulnerability "+vname)
                             print("No software list found \n")
                             soft_list = []
-                        self.dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]), int(pub_date[2])),
+                        '''self.dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]), int(pub_date[2])),
                                                         datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])),
-                                                        sev, score, bas_score, imp_score, exp_score, vect, descr, soft_list)
-                        #print("Name: "+vname+"\n Description: "+descr)
+                                                        sev, score, bas_score, imp_score, exp_score, vect, descr, soft_list)'''
+                        self.dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]), int(pub_date[2])),
+                            datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])), score, array(vect),
+                                                         descr, soft_list)
                         print("Saved vulnerability: "+vname)
                 except KeyError:
                     print("There's a problem with vulnerability "+child.attrib['name'])
@@ -71,7 +92,7 @@ class VulnDictionary:
             print(str(self.year) + " dictionary updated")
             return 1
         else:
-            print(str(self.year)+" dictionary is already updated")
+            print(str(self.year)+" dictionary is up to date")
             return 0
 
 

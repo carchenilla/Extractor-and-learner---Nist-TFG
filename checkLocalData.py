@@ -1,6 +1,8 @@
-import pickle
 import datetime
-from VulnDictionary import VulnDictionary
+import pickle
+from k_means import kmeans
+
+from extractor.VulnDictionary import VulnDictionary
 
 if __name__ == "__main__":
     count = 0
@@ -8,7 +10,7 @@ if __name__ == "__main__":
     vulnerability_list = []
     for i in range(2002, 2017):
         try:
-            with open("VulnDictionary_"+str(i)+".p", 'rb') as f:
+            with open("dictionaries/VulnDictionary_"+str(i)+".p", 'rb') as f:
                 dictionary_list.append(pickle.load(f))
         except IOError as err:
             print("Error with dictionary "+str(i)+" - "+str(err))
@@ -17,13 +19,16 @@ if __name__ == "__main__":
     print()
     for d in dictionary_list:
         if d.update()==1:
-            with open("VulnDictionary_" + str(d.year) + ".p", 'wb') as f:
+            with open("dictionaries/VulnDictionary_" + str(d.year) + ".p", 'wb') as f:
                 pickle.dump(d,f)
         count = count + len(d.dict.keys())
         vulnerability_list.extend(d.dict.values())
     print("Total: "+str(count))
-    '''print(str(len(vulnerability_list)))
-    print(vulnerability_list[-2].to_string())'''
-    for v in vulnerability_list:
-        if v.published <= datetime.date(1999,2,2):
-            print(v.to_string())
+
+    cost_list = []
+    for i in range(100):
+        print("\n Initializing k-means no. "+str(i))
+        (assig_list, cost) = kmeans.kmeans(4, vulnerability_list, 10)
+        cost_list.append(cost)
+        print("Distortion for iteration no. "+str(i)+" is :"+str(cost))
+    print(cost_list)

@@ -1,8 +1,9 @@
+import os
 import xml.etree.ElementTree as ET
 import zipfile
 from urllib.request import urlretrieve
-import os
-from Software import Software
+
+from extractor.Software import Software
 
 if __name__ == "__main__":
 
