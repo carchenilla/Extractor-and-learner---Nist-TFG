@@ -7,7 +7,7 @@ def kmeans(k, datalist, iterations):
     print("Generating centroids")
     centroids = generateCentroids(k, datalist)
     assignation_list = [-1]*len(datalist)
-    print("Centroids selected. Commencing")
+    print("Centroids selected. Commencing...")
     for it in range(iterations):
         print("Iteration no. "+str(it))
         for i in range(len(datalist)):

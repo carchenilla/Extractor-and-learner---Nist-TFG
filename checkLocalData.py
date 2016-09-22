@@ -25,10 +25,17 @@ if __name__ == "__main__":
         vulnerability_list.extend(d.dict.values())
     print("Total: "+str(count))
 
-    cost_list = []
+    lowest_cost = 1000
+    final_assig = None
     for i in range(100):
-        print("\n Initializing k-means no. "+str(i))
-        (assig_list, cost) = kmeans.kmeans(4, vulnerability_list, 10)
-        cost_list.append(cost)
-        print("Distortion for iteration no. "+str(i)+" is :"+str(cost))
-    print(cost_list)
+        print("\nInitializing k-means no. "+str(i+1))
+        (assig_list, cost) = kmeans.kmeans(3, vulnerability_list, 5)
+        if cost < lowest_cost:
+            print("Lower cost found: "+str(cost))
+            lowest_cost = cost
+            final_assig = assig_list
+    for k in range(3):
+        with open("Cluster no. "+ str(k+1) + ".txt", 'w') as f:
+            for i in range(len(final_assig)):
+                if final_assig[i]==k:
+                    f.write(str(vulnerability_list[i].vector)+"\n")
