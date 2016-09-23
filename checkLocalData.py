@@ -1,6 +1,5 @@
-import datetime
 import pickle
-from k_means import kmeans
+from k_means import elbowCheck
 
 from extractor.VulnDictionary import VulnDictionary
 
@@ -25,17 +24,4 @@ if __name__ == "__main__":
         vulnerability_list.extend(d.dict.values())
     print("Total: "+str(count))
 
-    lowest_cost = 1000
-    final_assig = None
-    for i in range(100):
-        print("\nInitializing k-means no. "+str(i+1))
-        (assig_list, cost) = kmeans.kmeans(3, vulnerability_list, 5)
-        if cost < lowest_cost:
-            print("Lower cost found: "+str(cost))
-            lowest_cost = cost
-            final_assig = assig_list
-    for k in range(3):
-        with open("Cluster no. "+ str(k+1) + ".txt", 'w') as f:
-            for i in range(len(final_assig)):
-                if final_assig[i]==k:
-                    f.write(str(vulnerability_list[i].vector)+"\n")
+    elbowCheck.elbow_check(vulnerability_list,9) #check between 1-9 clusters

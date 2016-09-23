@@ -5,9 +5,7 @@ if __name__ == "__main__":
     count = 0
     for i in range(2002,2017):
         myDic = VulnDictionary(i)
-        print(myDic.is_updated())
         myDic.update()
-        print(myDic.is_updated())
         print()
         with open("dictionaries/VulnDictionary_"+str(i)+".p",'wb') as f:
             pickle.dump(myDic, f)
