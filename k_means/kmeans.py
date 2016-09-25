@@ -1,7 +1,8 @@
 from random import sample
-from numpy import array, dot, linalg, append, round
+from numpy import array, dot, linalg, float32
 from extractor.Vulnerabilty import Vulnerability
 import datetime
+
 
 def kmeans(k, datalist, iterations):
     print("Generating centroids")
@@ -25,12 +26,12 @@ def kmeans(k, datalist, iterations):
 def calculate_distortion(datalist, assignation_list, centroids):
     counter = 0
     for i in range(len(datalist)):
-        counter = counter + distance(datalist[i], centroids[assignation_list[i]])
+        counter = counter + distance(datalist[i].vector, centroids[assignation_list[i]].vector)
     return counter/len(datalist)
 
 
 def relocate_centroid(datalist, assignation_list, k):
-    n_centr = array([0]*10)
+    n_centr = array([0]*len(datalist[0].vector), dtype=float32)
     count = 0
     for i in range(len(assignation_list)):
         if assignation_list[i]==k:
@@ -56,12 +57,8 @@ def generateCentroids(k, datalist):
 def getCentroid(vuln, centroids):
     distances = []
     for c in centroids:
-        distances.append(distance(c,vuln))
+        distances.append(distance(c.vector,vuln.vector))
     return distances.index(min(distances))
 
-
-def distance(v1, v2):
-    v = array(v1.vector)
-    w = array(v2.vector)
-    cos = dot(v,w)/(linalg.norm(v)*linalg.norm(w))
-    return 1-cos
+def distance(v, w):
+    return 1-dot(v,w)/(linalg.norm(v)*linalg.norm(w))

@@ -5,7 +5,7 @@ import zipfile
 from urllib.request import urlopen, urlretrieve
 from extractor.Vulnerabilty import Vulnerability
 from extractor.Software import Software
-from numpy import array
+from numpy import array, float32
 
 
 #ACCESS_VECTOR = {'L':'Local access', 'A': 'Adjacent Network', 'N': 'Network'}
@@ -82,7 +82,7 @@ class VulnDictionary:
                                                         datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])),
                                                         sev, score, bas_score, imp_score, exp_score, vect, descr, soft_list)'''
                         self.dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]), int(pub_date[2])),
-                            datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])), score, array(vect),
+                            datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])), score, array(vect, dtype=float32),
                                                          descr, soft_list)
                         print("Saved vulnerability: "+vname)
                 except KeyError:
