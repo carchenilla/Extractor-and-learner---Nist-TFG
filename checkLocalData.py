@@ -31,4 +31,4 @@ if __name__ == "__main__":
     print(str(cost))
     print(str(assig))'''
 
-    pca.pca(vulnerability_list, 10)
+    pca.pca(vulnerability_list, threshold = 0.90)
