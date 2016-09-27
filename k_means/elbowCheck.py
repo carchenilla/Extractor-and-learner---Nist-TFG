@@ -7,7 +7,7 @@ def elbow_check(datalist, krange):
     asig_list = []
     for k in range(1, krange):
         print("\nChecking cost for k="+str(k))
-        (cost, asig) = best_cost_kmeans(datalist, k)
+        (cost, asig) = kmeans.best_cost_kmeans(datalist, k=k)
         cost_list.append(cost)
         asig_list.append(asig)
     print("All iterations completed. Now plotting")
@@ -21,17 +21,3 @@ def elbow_check(datalist, krange):
             for i in range(len(final_assig)):
                 if final_assig[i] == k:
                     f.write(str(datalist[i].vector) + "\n")'''
-
-
-
-def best_cost_kmeans(datalist, k):
-    lowest_cost = 1000
-    final_assig = None
-    for i in range(100):
-        print("\nInitializing k-means no. "+str(i+1))
-        (assig_list, cost) = kmeans.kmeans(k, datalist, 5)
-        if cost < lowest_cost:
-            print("Lower cost found: "+str(cost))
-            lowest_cost = cost
-            final_assig = assig_list
-    return (lowest_cost, final_assig)

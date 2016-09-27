@@ -4,13 +4,13 @@ from extractor.Vulnerabilty import Vulnerability
 import datetime
 
 
-def kmeans(k, datalist, iterations):
+def kmeans(datalist, times=5, k=3):
     print("Generating centroids")
     centroids = generateCentroids(k, datalist)
     assignation_list = [-1]*len(datalist)
     print("Centroids selected. Commencing...")
-    for it in range(iterations):
-        print("Iteration no. "+str(it))
+    for it in range(times):
+        print("Iteration no. "+str(it+1))
         for i in range(len(datalist)):
             assignation_list[i] = getCentroid(datalist[i],centroids)
         for i in range(k):
@@ -62,3 +62,16 @@ def getCentroid(vuln, centroids):
 
 def distance(v, w):
     return 1-dot(v,w)/(linalg.norm(v)*linalg.norm(w))
+
+
+def best_cost_kmeans(datalist, iterations=100, times=5, k=3):
+    lowest_cost = 1000
+    final_assig = None
+    for i in range(iterations):
+        print("\nInitializing k-means no. "+str(i+1))
+        (assig_list, cost) = kmeans(datalist, times, k)
+        if cost < lowest_cost:
+            print("Lower cost found: "+str(cost))
+            lowest_cost = cost
+            final_assig = assig_list
+    return (lowest_cost, final_assig)

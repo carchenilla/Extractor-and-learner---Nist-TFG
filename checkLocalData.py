@@ -1,6 +1,6 @@
 import pickle
 from pca import pca
-from k_means import elbowCheck
+from k_means import elbowCheck, kmeans
 
 from extractor.VulnDictionary import VulnDictionary
 
@@ -25,10 +25,13 @@ if __name__ == "__main__":
         vulnerability_list.extend(d.dict.values())
     print("Total: "+str(count))
 
-    '''#elbowCheck.elbow_check(vulnerability_list,9) #check between 1-9 clusters
-    (cost, assig) = elbowCheck.best_cost_kmeans(vulnerability_list, 3)
+    my_list = pca.pca(vulnerability_list, threshold=0.90)
+    elbowCheck.elbow_check(my_list,9) #check between 1-8 clusters
+    '''(cost, assig) = kmeans.best_cost_kmeans(vulnerability_list, k=3)
     print("Finised.")
     print(str(cost))
     print(str(assig))'''
 
-    pca.pca(vulnerability_list, threshold = 0.90)
+    '''(cost, assig_list) = kmeans.best_cost_kmeans(my_list,k=3)
+    print(cost)
+    print(assig_list)'''

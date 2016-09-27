@@ -15,6 +15,7 @@ def pca(datalist, d=None, threshold = 0.99):
         x = transpose(v.vector)
         v.vector = transpose(new_U.dot(x))
     print("Done")
+    return normalized_list
     #print(normalized_list[14351].vector)
 
 
