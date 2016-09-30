@@ -1,8 +1,9 @@
 import pickle
+from Knn import kNN
 from pca import pca
 from k_means import elbowCheck, kmeans
+from data_types.VulnDictionary import VulnDictionary
 
-from extractor.VulnDictionary import VulnDictionary
 
 if __name__ == "__main__":
     count = 0
@@ -18,20 +19,37 @@ if __name__ == "__main__":
             dictionary_list.append(VulnDictionary(i))
     print()
     for d in dictionary_list:
-        if d.update()==1:
-            with open("dictionaries/VulnDictionary_" + str(d.year) + ".p", 'wb') as f:
-                pickle.dump(d,f)
+        d.update()
         count = count + len(d.dict.keys())
-        vulnerability_list.extend(d.dict.values())
+        vulnerability_list.extend(list(d.dict.values()))
     print("Total: "+str(count))
 
-    my_list = pca.pca(vulnerability_list, threshold=0.90)
-    elbowCheck.elbow_check(my_list,9) #check between 1-8 clusters
-    '''(cost, assig) = kmeans.best_cost_kmeans(vulnerability_list, k=3)
-    print("Finised.")
-    print(str(cost))
-    print(str(assig))'''
+    #(cost, assig) = kmeans.best_cost_kmeans(vulnerability_list, times=6, k=4)
 
-    '''(cost, assig_list) = kmeans.best_cost_kmeans(my_list,k=3)
-    print(cost)
-    print(assig_list)'''
+    '''print("Finished K-means. Saving data to dictionaries and disk")
+    for x in assig:
+        for d in dictionary_list:
+            v = d.dict.get(x[0])
+            if v != None:
+                v.group = x[1]
+
+    for d in dictionary_list:
+        try:
+            with open("dictionaries/VulnDictionary_"+str(d.year)+".p", 'wb') as f:
+                pickle.dump(d,f)
+        except IOError as err:
+            print("Error with dictionary "+str(d.year)+" - "+str(err))'''
+
+    print("Done. Now validating results with Knn for 2016")
+    print("Using k = 7")
+
+    train_data = []
+    test_data = []
+
+    for d in dictionary_list:
+        if d.year < 2016:
+            train_data.extend(list(d.dict.values()))
+        else:
+            test_data.extend(list(d.dict.values()))
+
+    kNN.knn(train_data, test_data, 1)

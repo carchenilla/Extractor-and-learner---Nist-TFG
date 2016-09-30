@@ -1,5 +1,5 @@
 import pickle
-from extractor.VulnDictionary import VulnDictionary
+from data_types.VulnDictionary import VulnDictionary
 
 if __name__ == "__main__":
     count = 0

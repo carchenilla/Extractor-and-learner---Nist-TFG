@@ -11,6 +11,7 @@ class Vulnerability():
         self.vector = vector
         self.description = description
         self.soft_list = soft_list
+        self.group = -1
 
     def to_string(self):
         aux = ""

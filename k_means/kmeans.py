@@ -1,18 +1,19 @@
 from random import sample
-from numpy import array, dot, linalg, float32
-from extractor.Vulnerabilty import Vulnerability
+from numpy import array, float32
+from data_types.Vulnerabilty import Vulnerability
+from distances.distances import cosine_distance
 import datetime
 
 
 def kmeans(datalist, times=5, k=3):
     print("Generating centroids")
     centroids = generateCentroids(k, datalist)
-    assignation_list = [-1]*len(datalist)
+    assignation_list = [(-1,-1)]*len(datalist)
     print("Centroids selected. Commencing...")
     for it in range(times):
         print("Iteration no. "+str(it+1))
         for i in range(len(datalist)):
-            assignation_list[i] = getCentroid(datalist[i],centroids)
+            assignation_list[i] = (datalist[i].name, getCentroid(datalist[i],centroids))
         for i in range(k):
             nc = relocate_centroid(datalist, assignation_list, i)
             if nc != None:
@@ -26,7 +27,7 @@ def kmeans(datalist, times=5, k=3):
 def calculate_distortion(datalist, assignation_list, centroids):
     counter = 0
     for i in range(len(datalist)):
-        counter = counter + distance(datalist[i].vector, centroids[assignation_list[i]].vector)
+        counter = counter + cosine_distance(datalist[i].vector, centroids[assignation_list[i][1]].vector)
     return counter/len(datalist)
 
 
@@ -34,7 +35,7 @@ def relocate_centroid(datalist, assignation_list, k):
     n_centr = array([0]*len(datalist[0].vector), dtype=float32)
     count = 0
     for i in range(len(assignation_list)):
-        if assignation_list[i]==k:
+        if assignation_list[i][1]==k:
             n_centr = n_centr + datalist[i].vector
             count = count+1
     if count==0:
@@ -57,12 +58,8 @@ def generateCentroids(k, datalist):
 def getCentroid(vuln, centroids):
     distances = []
     for c in centroids:
-        distances.append(distance(c.vector,vuln.vector))
+        distances.append(cosine_distance(c.vector,vuln.vector))
     return distances.index(min(distances))
-
-def distance(v, w):
-    return 1-dot(v,w)/(linalg.norm(v)*linalg.norm(w))
-
 
 def best_cost_kmeans(datalist, iterations=100, times=5, k=3):
     lowest_cost = 1000

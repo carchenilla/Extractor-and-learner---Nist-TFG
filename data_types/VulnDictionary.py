@@ -3,8 +3,8 @@ import os
 import xml.etree.ElementTree as ET
 import zipfile
 from urllib.request import urlopen, urlretrieve
-from extractor.Vulnerabilty import Vulnerability
-from extractor.Software import Software
+from data_types.Vulnerabilty import Vulnerability
+from data_types.Software import Software
 from numpy import array, float32
 
 

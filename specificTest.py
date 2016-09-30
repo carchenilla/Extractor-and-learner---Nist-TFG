@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 from urllib.request import urlretrieve
 
-from extractor.Software import Software
+from data_types.Software import Software
 
 if __name__ == "__main__":
 
