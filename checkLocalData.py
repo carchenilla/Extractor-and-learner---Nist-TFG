@@ -1,6 +1,7 @@
 import pickle
 from Knn import kNN
 from pca import pca
+import matplotlib.pyplot as plt
 from k_means import elbowCheck, kmeans
 from data_types.VulnDictionary import VulnDictionary
 
@@ -24,10 +25,10 @@ if __name__ == "__main__":
         vulnerability_list.extend(list(d.dict.values()))
     print("Total: "+str(count))
 
-    #(cost, assig) = kmeans.best_cost_kmeans(vulnerability_list, times=6, k=4)
+    #(cost, assig) = kmeans.best_cost_kmeans(vulnerability_list, times=7, k=4)
 
-    '''print("Finished K-means. Saving data to dictionaries and disk")
-    for x in assig:
+    print("Finished K-means. Saving data to dictionaries and disk")
+    '''for x in assig:
         for d in dictionary_list:
             v = d.dict.get(x[0])
             if v != None:
@@ -41,7 +42,9 @@ if __name__ == "__main__":
             print("Error with dictionary "+str(d.year)+" - "+str(err))'''
 
     print("Done. Now validating results with Knn for 2016")
-    print("Using k = 7")
+
+    k_list = range(1,11)
+    results_list = []
 
     train_data = []
     test_data = []
@@ -52,4 +55,8 @@ if __name__ == "__main__":
         else:
             test_data.extend(list(d.dict.values()))
 
-    kNN.knn(train_data, test_data, 1)
+    for i in k_list:
+        results_list.append(kNN.knn(train_data, test_data, i))
+
+    plt.plot(k_list, test_data)
+    plt.show()

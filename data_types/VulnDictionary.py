@@ -63,13 +63,12 @@ class VulnDictionary:
                         vname = child.attrib['name']
                         pub_date = child.attrib['published'].split('-')
                         mod_date = child.attrib['modified'].split('-')
-                        sev = SEVERITY.get(str(child.attrib['severity']))
                         score = float(child.attrib['CVSS_score'])
                         bas_score = float(child.attrib['CVSS_base_score'])
                         imp_score = float(child.attrib['CVSS_impact_subscore'])
                         exp_score = float(child.attrib['CVSS_exploit_subscore'])
                         # vect = self.extract_vector(child.attrib['CVSS_vector'])
-                        vect = [bas_score, imp_score, exp_score, sev]
+                        vect = [bas_score, imp_score, exp_score]
                         vect. extend(self.extract_vector(child.attrib['CVSS_vector']))
                         descr = child[0][0].text
                         try:

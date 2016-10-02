@@ -23,4 +23,5 @@ def knn(datalist, testlist, k, distance=0):
         print("Tested "+str(count)+" of "+str(len(testlist)))
     print("Total of mistakes: "+str(wrong))
     print("Total of successes: "+str(right))
-    print("Percentage of success: "+str(100*right/(right+wrong))+"%")
+    print("Percentage of success: "+str(100*(right/(right+wrong)))+"%")
+    return 100*(right/(right+wrong))
