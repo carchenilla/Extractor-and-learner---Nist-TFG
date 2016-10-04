@@ -1,3 +1,4 @@
+from random import sample
 import pickle
 from Knn import kNN
 from pca import pca
@@ -39,24 +40,36 @@ if __name__ == "__main__":
             with open("dictionaries/VulnDictionary_"+str(d.year)+".p", 'wb') as f:
                 pickle.dump(d,f)
         except IOError as err:
-            print("Error with dictionary "+str(d.year)+" - "+str(err))'''
+            print("Error with dictionary "+str(d.year)+" - "+str(err))
 
-    print("Done. Now validating results with Knn for 2016")
-
-    k_list = range(1,11)
-    results_list = []
+    print("Done. Now validating results with Knn for 2016")'''
 
     train_data = []
     test_data = []
+    results_list = []
 
     for d in dictionary_list:
         if d.year < 2016:
             train_data.extend(list(d.dict.values()))
         else:
-            test_data.extend(list(d.dict.values()))
+            data_2016 = list(d.dict.values())
 
-    for i in k_list:
+    samples = sample(range(4000),500)
+
+    for i in range(len(data_2016)):
+        if i in samples:
+            test_data.append(data_2016[i])
+        else:
+            train_data.append(data_2016[i])
+
+    print(len(train_data))
+    print(len(test_data))
+
+
+    for i in range(1,11):
+        print("Check knn for k="+str(i))
         results_list.append(kNN.knn(train_data, test_data, i))
 
-    plt.plot(k_list, test_data)
+
+    plt.plot(range(1,11), results_list)
     plt.show()
