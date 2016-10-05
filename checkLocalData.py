@@ -26,10 +26,10 @@ if __name__ == "__main__":
         vulnerability_list.extend(list(d.dict.values()))
     print("Total: "+str(count))
 
-    #(cost, assig) = kmeans.best_cost_kmeans(vulnerability_list, times=7, k=4)
+    (cost, assig) = kmeans.best_cost_kmeans(vulnerability_list, times=7, k=4)
 
     print("Finished K-means. Saving data to dictionaries and disk")
-    '''for x in assig:
+    for x in assig:
         for d in dictionary_list:
             v = d.dict.get(x[0])
             if v != None:
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         except IOError as err:
             print("Error with dictionary "+str(d.year)+" - "+str(err))
 
-    print("Done. Now validating results with Knn for 2016")'''
+    '''print("Done. Now validating results with Knn for 2016")
 
     train_data = []
     test_data = []
@@ -72,4 +72,4 @@ if __name__ == "__main__":
 
 
     plt.plot(range(1,11), results_list)
-    plt.show()
+    plt.show()'''

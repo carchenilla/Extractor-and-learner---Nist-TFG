@@ -112,7 +112,7 @@ class VulnDictionary:
                 if ed != None:
                     ver = ver + " " + ed
                 version_list.append(ver)
-            software_list.append(Software(vuln_soft[i].get('name'), vuln_soft[i].get('vendor'), version_list))
+            software_list.append(Software(str(vuln_soft[i].get('name')), vuln_soft[i].get('vendor'), version_list))
         return software_list
 
     def to_string(self):
