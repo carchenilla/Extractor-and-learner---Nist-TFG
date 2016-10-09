@@ -1,6 +1,6 @@
 from sklearn import svm
 
-def run_svm(datalist, testlist, kernel=None, gamma = None):
+def run_svm(datalist, testlist, kernel=None, gamma = 0.125):
     X = list(x.vector for x in datalist)
     Y = list(x.group for x in datalist)
 
