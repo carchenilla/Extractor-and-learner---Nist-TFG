@@ -2,7 +2,7 @@ from distances.distances import euclidean_distance, cosine_distance
 from collections import Counter
 
 
-def knn(datalist, testlist, k, distance=0):
+def run_knn(datalist, testlist, k):
     right = 0
     wrong = 0
     count = 0
@@ -23,5 +23,5 @@ def knn(datalist, testlist, k, distance=0):
         print("Tested "+str(count)+" of "+str(len(testlist)))
     print("Total of mistakes: "+str(wrong))
     print("Total of successes: "+str(right))
-    print("Percentage of success: "+str(100*(right/(right+wrong)))+"%")
-    return (100*(right/(right+wrong)))
+    print("Percentage of success: "+str(right/(right+wrong)))
+    return (right/(right+wrong))

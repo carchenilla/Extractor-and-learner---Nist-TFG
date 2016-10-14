@@ -1,8 +1,9 @@
 from numpy import array, float32, power, transpose, linalg
-
+from copy import deepcopy
 
 def pca(datalist, d=None, threshold = 0.99):
-    normalized_list = normalize(datalist)
+    datalist_copy = deepcopy(datalist)
+    normalized_list = normalize(datalist_copy)
     sigma = getSigma(normalized_list)
     U, s, V = linalg.svd(sigma, full_matrices=True)
     if d==None:
