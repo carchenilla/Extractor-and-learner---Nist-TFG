@@ -23,7 +23,7 @@ if __name__ == "__main__":
         except IOError as err:
             print("Error with dictionary "+str(i)+" - "+str(err))
             print("Creating dictionary from scratch")
-            dictionary_list.append(VulnDictionary(i))
+            dictionary_list.append(VulnDictionary(i).update())
     print()
 
     for d in dictionary_list:
