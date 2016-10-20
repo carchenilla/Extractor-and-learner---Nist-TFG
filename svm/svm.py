@@ -1,8 +1,8 @@
 from sklearn import svm
 
 def run_svm(datalist, testlist, kernel=None, gamma = 0.125):
-    X = list(x.vector for x in datalist)
-    Y = list(x.group for x in datalist)
+    X = [x.vector for x in datalist]
+    Y = [x.group for x in datalist]
 
     if kernel != None:
         clf = svm.SVC(kernel=kernel, gamma=gamma)

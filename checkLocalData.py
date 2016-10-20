@@ -1,8 +1,9 @@
 import pickle
+from dbscan.dbscan import run_dbscan
 from random import sample
 from Knn.kNN import run_knn
+from distances.distances import cosine_distance
 from pca.pca import pca
-from svm import svm
 import matplotlib.pyplot as plt
 from k_means import elbowCheck, kmeans
 from svm.svm import run_svm
@@ -33,19 +34,7 @@ if __name__ == "__main__":
             vulnerability_list.extend(list(d.dict.values()))
     print("Total: "+str(len(vulnerability_list)))
 
-    positions = sample(range(len(vulnerability_list)), int(0.15*(len(vulnerability_list))))
-
-    train_list = []
-    test_list = []
-    for i in range(len(vulnerability_list)):
-        if i in positions:
-            test_list.append(vulnerability_list[i])
-        else:
-            train_list.append(vulnerability_list[i])
-
-    '''print("Beginning ML training of data from 2009 - 2016")
-    asig = run_hierarchical(pca(vulnerability_list, threshold=0.95))
-    print("Finished hierarchical cluster. Saving data to dictionaries and disk")
+    '''asig = run_dbscan(pca(vulnerability_list, threshold=0.95),0.02, 553)
 
     for x in asig:
         found = False
@@ -58,11 +47,26 @@ if __name__ == "__main__":
                 found = True
             i = i + 1
 
-    run_svm(train_list, test_list, "rbf")
-
     for d in dictionary_list:
         try:
-            with open("dictionaries/VulnDictionary_"+str(d.year)+".p", 'wb') as f:
-                pickle.dump(d,f)
+            with open("dictionaries/VulnDictionary_" + str(d.year) + ".p", 'wb') as f:
+                pickle.dump(d, f)
         except IOError as err:
-            print("Error with dictionary "+str(d.year)+" - "+str(err))'''
+            print("Error with dictionary " + str(d.year) + " - " + str(err))'''
+
+    for x in range(10):
+        positions = sample(range(len(vulnerability_list)), int(0.2*(len(vulnerability_list))))
+
+        train_list = []
+        test_list = []
+        for i in range(len(vulnerability_list)):
+            if ((i in positions) and (vulnerability_list[i].group!=-1)):
+                test_list.append(vulnerability_list[i])
+            elif ((not (i in positions)) and (vulnerability_list[i].group!=-1)):
+                train_list.append(vulnerability_list[i])
+
+        print("Beginning validation")
+        print("Training set: "+str(len(train_list)))
+        print("Validation set: "+str(len(test_list)))
+
+        run_svm(train_list, test_list, gamma=0.125)
