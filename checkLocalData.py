@@ -34,7 +34,7 @@ if __name__ == "__main__":
             vulnerability_list.extend(list(d.dict.values()))
     print("Total: "+str(len(vulnerability_list)))
 
-    '''asig = run_dbscan(pca(vulnerability_list, threshold=0.95),0.02, 553)
+    '''asig = run_dbscan(pca(vulnerability_list, threshold=0.95))
 
     for x in asig:
         found = False
@@ -69,4 +69,4 @@ if __name__ == "__main__":
         print("Training set: "+str(len(train_list)))
         print("Validation set: "+str(len(test_list)))
 
-        run_svm(train_list, test_list, gamma=0.125)
+        run_knn(train_list,test_list,4)

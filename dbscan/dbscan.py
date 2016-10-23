@@ -5,11 +5,10 @@ from distances.distances import cosine_distance
 from numpy import array, float32, zeros
 
 
-def run_dbscan(datalist, eps=0.02, min_pts=553):
-    #BEST EPSILON = 0.02
-    #BEST MIN_PTS = 553
+def run_dbscan(datalist, eps=0.022, min_pts=2686):
+    #BEST EPSILON = 0.022
+    #BEST MIN_PTS = 2686
     x = [v.vector for v in datalist]
-
     print("Creating distance matrix using cosine distance")
     z = create_distance_matrix(x, eps)
     print("Matrix created. Now training DBSCAN...")
@@ -75,11 +74,10 @@ def find_neighbors_at_distance(datalist, distance):
         current += 1
         print(str(current)+" of "+str(len(datalist)))
 
-    yaxis = [min(n, len(datalist)) for n in range(0, len(datalist), step)]
-    plt.barh(final_list, yaxis)
-    plt.xlabel("Nº de vulnerabilidades")
-    plt.ylabel("Vecinos a distancia "+str(distance))
-    plt.show()
+    xaxis = [min(n, len(datalist)) for n in range(0, len(datalist), step)]
+    print(str(step))
+    print(xaxis)
+    print(final_list)
 
 
 def find_distance_of_nearest_neighbor(datalist):
