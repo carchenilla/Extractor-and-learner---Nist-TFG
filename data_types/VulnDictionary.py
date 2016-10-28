@@ -9,24 +9,24 @@ from numpy import array, float32
 
 
 #ACCESS_VECTOR = {'L':'Local access', 'A': 'Adjacent Network', 'N': 'Network'}
-ACCESS_VECTOR = {'L':0, 'A': 1, 'N': 2}
+ACCESS_VECTOR = {'L':1, 'A':2, 'N':3}
 
 #ACCESS_COMPLEXITY = {'H':'High', 'M':'Medium', 'L':'Low'}
-ACCESS_COMPLEXITY = {'H':2, 'M':1, 'L':0}
+ACCESS_COMPLEXITY = {'H':3, 'M':2, 'L':1}
 
 #AUTHENTIFICATION = {'N':'None required', 'S':'Requires single instance', 'M':'Requires multiple instances'}
-AUTHENTIFICATION = {'N':0, 'S':1, 'M':2}
+AUTHENTIFICATION = {'N':1, 'S':2, 'M':3}
 
 #CONF_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
-CONF_IMPACT = {'N':0, 'P':1, 'C':2}
+CONF_IMPACT = {'N':1, 'P':2, 'C':3}
 
 #INTEG_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
-INTEG_IMPACT = {'N':0, 'P':1, 'C':2}
+INTEG_IMPACT = {'N':1, 'P':2, 'C':3}
 
 #AVAIL_IMPACT = {'N':'None', 'P':'Partial','C':'Complete'}
-AVAIL_IMPACT = {'N':0, 'P':1, 'C':2}
+AVAIL_IMPACT = {'N':1, 'P':2, 'C':3}
 
-SEVERITY = {'Low':0, 'Medium':1, 'High':2}
+SEVERITY = {'Low':1, 'Medium':2, 'High':3}
 
 
 FEATURES_LIST = [ACCESS_VECTOR, ACCESS_COMPLEXITY, AUTHENTIFICATION, CONF_IMPACT, INTEG_IMPACT, AVAIL_IMPACT]

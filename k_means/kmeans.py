@@ -5,7 +5,7 @@ from distances.distances import cosine_distance
 import datetime
 
 
-def kmeans(datalist, times=5, k=3):
+def kmeans(datalist, times=6, k=4):
     print("Generating centroids")
     centroids = generateCentroids(k, datalist)
     assignation_list = [(-1,-1)]*len(datalist)
@@ -41,7 +41,6 @@ def relocate_centroid(datalist, assignation_list, k):
     if count==0:
         return None
     new_v1 = n_centr/count
-    #new_v1 = append(aux[:3],round(aux)[3:len(aux)])
     new_centroid = Vulnerability("Custom Vulnerability no. "+str(k), datetime.date(2000,1,1), datetime.date(2000,1,1),
                                  new_v1[0], new_v1, "No description", "No soft list")
     return new_centroid
@@ -61,7 +60,8 @@ def getCentroid(vuln, centroids):
         distances.append(cosine_distance(c.vector,vuln.vector))
     return distances.index(min(distances))
 
-def best_cost_kmeans(datalist, iterations=100, times=5, k=3):
+
+def run_kmeans(datalist, iterations=100, times=6, k=4):
     lowest_cost = 1000
     final_assig = None
     for i in range(iterations):

@@ -44,21 +44,14 @@ def run_hierarchical(datalist, distance = "ward"):
 
     sys.setrecursionlimit(10000)
 
-    print("Training hierarchical...")
-    try:
-        Z = linkage(X, distance)
-        print("Training hierarchical for plot")
-        plot_Z = linkage(plot_X, 'ward')
-    except ValueError as err:
-        print(str(err))
-        Z = linkage(X, distance)
-        plot_Z = linkage(plot_X, 'ward')
+    print("Training hierarchical for plot...")
+    plot_Z = linkage(plot_X, 'ward')
 
 
     plt.title('Hierarchical Clustering Dendrogram (truncated)')
     plt.xlabel('sample index')
     plt.ylabel('distance')
-    max_d = 110
+    max_d = 125
     fancy_dendrogram(
         plot_Z,
         truncate_mode='lastp',
@@ -70,11 +63,14 @@ def run_hierarchical(datalist, distance = "ward"):
         max_d=max_d
     )
     plt.show()
+
     try:
         max_d = int(input("Introduce new max_d quantity: "))
     except ValueError:
-        max_d = 110
+        max_d = 125
 
+    print("Training hierarchical for max_d = "+str(max_d)+"...")
+    Z = linkage(X, distance)
     clusters = fcluster(Z, max_d, criterion="distance")
 
     for i in range(len(clusters)):

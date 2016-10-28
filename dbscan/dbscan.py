@@ -5,26 +5,14 @@ from distances.distances import cosine_distance
 from numpy import array, float32, zeros
 
 
-def run_dbscan(datalist, eps=0.022, min_pts=2686):
-    #BEST EPSILON = 0.022
+def run_dbscan(datalist, eps=0.0195, min_pts=2686):
+    #BEST EPSILON = 0.0195
     #BEST MIN_PTS = 2686
     x = [v.vector for v in datalist]
+
     print("Creating distance matrix using cosine distance")
     z = create_distance_matrix(x, eps)
     print("Matrix created. Now training DBSCAN...")
-    try:
-        step = z.shape[0]//4
-        rows = [min(n, z.shape[0]) for n in range(step, z.shape[0], step)]
-
-        for r in range(len(rows)-1):
-            with open("matrix/rows_" + str(rows[r]) + ".p",'wb') as f:
-                dump(z[rows[r]-step:rows[r],:], f)
-
-        with open("matrix/rows_" + str(rows[-1]) + ".p", 'wb') as f:
-            dump(z[rows[-2]:rows[-1]+1, :], f)
-
-    except IOError as err:
-        print(str(err))
 
     labels = DBSCAN(eps=eps, min_samples=min_pts, metric='precomputed').fit_predict(z)
 
@@ -81,16 +69,23 @@ def find_neighbors_at_distance(datalist, distance):
 
 
 def find_distance_of_nearest_neighbor(datalist):
-    final_list = []
+    step = 0.125
+    final_list = [0]*16
+    counter = 0
     for v in datalist:
         distances = []
         for v2 in datalist:
             if not ((v==v2).all()):
                 distances.append(cosine_distance(v,v2))
-        final_list.append(min(distances))
-        print(str(len(final_list))+ " of " +str(len(datalist)))
+        min_v = min(distances)
+        try:
+            final_list[int(min_v//step)] += 1
+        except IndexError as err:
+            final_list[-1] += 1
+        counter += 1
+        print(str(counter)+ " of " +str(len(datalist)))
 
-    plt.plot(range(len(final_list)), final_list)
-    plt.xlabel("Vulnerabilidades")
-    plt.ylabel("Distancia al vecino más cercano")
-    plt.show()
+    xaxis = [min(n, 2) for n in range(0, 2, step)]
+    print(str(step))
+    print(xaxis)
+    print(final_list)

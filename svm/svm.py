@@ -26,3 +26,4 @@ def run_svm(datalist, testlist, kernel=None, gamma = 0.125):
             fail = fail + 1
 
     print("Ratio of success: "+str(right/(right+fail)))
+    return right/(right+fail)
