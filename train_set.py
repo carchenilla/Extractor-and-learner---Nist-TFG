@@ -1,11 +1,9 @@
-import pickle, time
-from dbscan.dbscan import run_dbscan
-from pca.pca import pca
-from k_means.kmeans import run_kmeans
+import pickle
+import time
+
 from hierarchical.hierarchical import run_hierarchical
+
 from data_types.VulnDictionary import VulnDictionary
-
-
 
 if __name__ == "__main__":
     count = 0
