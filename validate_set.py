@@ -2,9 +2,9 @@ import pickle
 import time
 from random import sample
 from numpy import mean, array
+from validating.kNN import run_knn
+
 from data_types.VulnDictionary import VulnDictionary
-from validating.svm.svm import run_svm
-from validating.kNN.kNN import run_knn
 
 if __name__ == "__main__":
     count = 0

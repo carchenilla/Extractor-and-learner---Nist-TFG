@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from clustering.k_means import kmeans
+from clustering import kmeans
 
 
 def elbow_check(datalist, krange):

@@ -1,5 +1,4 @@
 from collections import Counter
-
 from others.distances import cosine_distance
 
 

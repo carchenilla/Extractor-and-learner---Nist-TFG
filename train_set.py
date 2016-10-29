@@ -1,8 +1,8 @@
 import pickle
 import time
-from clustering.hierarchical.hierarchical import  run_hierarchical
-from others.pca import pca
+from clustering.hierarchical import  run_hierarchical
 from data_types.VulnDictionary import VulnDictionary
+from others.pca import pca
 
 if __name__ == "__main__":
     count = 0
