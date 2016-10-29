@@ -1,8 +1,7 @@
 import pickle
 import time
-
-from hierarchical.hierarchical import run_hierarchical
-
+from clustering.hierarchical.hierarchical import  run_hierarchical
+from others.pca import pca
 from data_types.VulnDictionary import VulnDictionary
 
 if __name__ == "__main__":
@@ -27,7 +26,7 @@ if __name__ == "__main__":
     print("Total: "+str(len(vulnerability_list)))
 
     start_time = time.time()
-    asig = run_hierarchical(vulnerability_list)
+    asig = run_hierarchical(pca(vulnerability_list,d=5))
     end_time = time.time()
 
     for x in asig:
