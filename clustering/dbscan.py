@@ -83,7 +83,39 @@ def find_distance_of_nearest_neighbor(datalist):
         counter += 1
         print(str(counter)+ " of " +str(len(datalist)))
 
-    xaxis = [min(n, 2) for n in range(0, 2, step)]
+    try:
+        with open("results.p", 'wb') as f:
+            pickle.dump(final_list,f)
+    except err:
+        print(str(err.with_traceback()))
+
+    xaxis = list(arange(0,2,step))
     print(str(step))
     print(xaxis)
     print(final_list)
+
+
+
+
+import pickle
+from numpy import arange
+
+if __name__ == "__main__":
+    count = 0
+    dictionary_list = []
+    vulnerability_list = []
+    test_list = []
+    for i in range(2002, 2017):
+        with open("../dictionaries/VulnDictionary_"+str(i)+".p", 'rb') as f:
+            dictionary_list.append(pickle.load(f))
+    print()
+
+    for d in dictionary_list:
+        if d.year > 2008:
+            count = count + len(d.dict.keys())
+            vulnerability_list.extend(list(d.dict.values()))
+    print("Total: "+str(len(vulnerability_list)))
+
+    x = [v.vector for v in vulnerability_list]
+
+    find_distance_of_nearest_neighbor(x)

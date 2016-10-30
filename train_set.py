@@ -48,3 +48,6 @@ if __name__ == "__main__":
             print("Error with dictionary " + str(d.year) + " - " + str(err))
 
     print("--- %s seconds ---" % (end_time - start_time))
+
+    with open("results.p", 'wb') as f:
+        pickle.dump(end_time-start_time, f)
