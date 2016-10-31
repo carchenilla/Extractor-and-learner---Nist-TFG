@@ -1,12 +1,12 @@
 from sklearn import svm
 
-def run_svm(datalist, testlist, kernel=None, gamma = 0.125):
+def run_svm(datalist, testlist, kernel=None, gamma = 0.125, deg = 1, r = 0):
     X = [x.vector for x in datalist]
     Y = [x.group for x in datalist]
 
     if kernel != None:
-        clf = svm.SVC(kernel=kernel, gamma=gamma)
-        s = str(kernel)+" kernel with gamma = "+str(gamma)+"."
+        clf = svm.SVC(kernel=kernel, gamma=gamma, deg=deg, r=r)
+        s = str(kernel)+" kernel with "+str(gamma)+" = "+str(gamma)+", "+str(deg)+", "+str(r)
     else:
         clf = svm.SVC(kernel='linear')
         s = "linear kernel."

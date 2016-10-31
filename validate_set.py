@@ -1,10 +1,8 @@
-import pickle
-import time
+import pickle, time
 from random import sample
 from numpy import mean, array
 from validating.kNN import run_knn
 from validating.svm import run_svm
-
 from data_types.VulnDictionary import VulnDictionary
 
 if __name__ == "__main__":
@@ -30,8 +28,8 @@ if __name__ == "__main__":
 
     results_list = []
 
-    for x in range(10):
-        positions = sample(range(len(vulnerability_list)), int(0.2*(len(vulnerability_list))))
+    for x in range(2):
+        positions = sample(range(len(vulnerability_list)), int(0.1*(len(vulnerability_list))))
 
         train_list = []
         test_list = []
@@ -47,7 +45,7 @@ if __name__ == "__main__":
         print("Validation set: "+str(len(test_list)))
 
         start_time = time.time()
-        results_list.append(run_svm(train_list, test_list,'rbf',0.125))
+        results_list.append(run_knn(train_list, test_list, 4))
         end_time = time.time()
 
     print("--- %s seconds ---" % (end_time - start_time))

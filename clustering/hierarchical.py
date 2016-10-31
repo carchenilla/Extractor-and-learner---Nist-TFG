@@ -28,7 +28,19 @@ def fancy_dendrogram(*args, **kwargs):
     return ddata
 
 
-def run_hierarchical(datalist, distance = "ward"):
+def run_hierarchical(datalist, max_d, distance = "ward"):
+    my_list = [(x.name, -1) for x in datalist]
+    X = [x.vector for x in datalist]
+    print("Training hierarchical for max_d = "+str(max_d)+"...")
+    Z = linkage(X, distance)
+    clusters = fcluster(Z, max_d, criterion="distance")
+    for i in range(len(clusters)):
+        my_list[i] = (my_list[i][0], clusters[i])
+    return my_list
+
+
+
+def run_hierarchical_with_plot(datalist, distance='ward'):
     my_list = [(x.name, -1) for x in datalist]
     X = [x.vector for x in datalist]
     plot_X = []
@@ -51,7 +63,7 @@ def run_hierarchical(datalist, distance = "ward"):
     plt.title('Hierarchical Clustering Dendrogram (truncated)')
     plt.xlabel('sample index')
     plt.ylabel('distance')
-    max_d = 125
+    max_d = 150
     fancy_dendrogram(
         plot_Z,
         truncate_mode='lastp',
@@ -65,11 +77,11 @@ def run_hierarchical(datalist, distance = "ward"):
     plt.show()
 
     try:
-        max_d = int(input("Introduce new max_d quantity: "))
+        max_d = str(input("Introduce new value for max_d"))
     except ValueError:
-        max_d = 125
+        pass
 
-    print("Training hierarchical for max_d = "+str(max_d)+"...")
+    print("Training hierarchical for max_d = " + str(max_d) + "...")
     Z = linkage(X, distance)
     clusters = fcluster(Z, max_d, criterion="distance")
 
