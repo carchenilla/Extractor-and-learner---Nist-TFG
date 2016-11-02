@@ -130,21 +130,21 @@ class MiAplicacion(QtGui.QDialog):
                 it = int(self.ui.kmeans_iters_line.text())
                 tim = int(self.ui.kmeans_times_line.text())
                 k = int(self.ui.kmeans_k_line.text())
+                print("\nLoading dictionaries and extracting vulnerabilities...")
+                my_years, dictionaries, vuln_list = self.loadData()
+                datalist = vuln_list
+                if self.ui.pca_box.isChecked():
+                    datalist = self.applyPCA(vuln_list)
+                if len(datalist)>0:
+                    t = MyThread('kmeans', [datalist, it, tim, k, dictionaries])
+                    t.daemon = True
+                    t.start()
+                else:
+                    print("No vulnerabilities selected")
             except ValueError as err:
                 self.ui.text_window.clear()
                 print(str(err))
                 print("Error in a parameter of K-means, please revise.")
-            print("\nLoading dictionaries and extracting vulnerabilities...")
-            my_years, dictionaries, vuln_list = self.loadData()
-            datalist = vuln_list
-            if self.ui.pca_box.isChecked():
-                datalist = self.applyPCA(vuln_list)
-            if len(datalist)>0:
-                t = MyThread('kmeans', [datalist, it, tim, k, dictionaries])
-                t.daemon = True
-                t.start()
-            else:
-                print("No vulnerabilities selected")
 
     def executeHierarch(self):
         if len(threading.enumerate())<2:
@@ -152,21 +152,21 @@ class MiAplicacion(QtGui.QDialog):
             try:
                 max_d = int(self.ui.hier_maxd_line.text())
                 link = str(self.ui.hier_linkage_box.currentText())
+                print("\nLoading dictionaries and extracting vulnerabilities...")
+                my_years, dictionaries, vuln_list = self.loadData()
+                datalist = vuln_list
+                if self.ui.pca_box.isChecked():
+                    datalist = self.applyPCA(vuln_list)
+                if len(datalist) > 0:
+                    t = MyThread('hierarch', [datalist, max_d, link, dictionaries])
+                    t.daemon = True
+                    t.start()
+                else:
+                    print("No vulnerabilities selected")
             except ValueError as err:
                 self.ui.text_window.clear()
                 print(str(err))
                 print("Error in a parameter of Hierarchical, please revise.")
-            print("\nLoading dictionaries and extracting vulnerabilities...")
-            my_years, dictionaries, vuln_list = self.loadData()
-            datalist = vuln_list
-            if self.ui.pca_box.isChecked():
-                datalist = self.applyPCA(vuln_list)
-            if len(datalist) > 0:
-                t = MyThread('hierarch', [datalist, max_d, link, dictionaries])
-                t.daemon = True
-                t.start()
-            else:
-                print("No vulnerabilities selected")
 
     def executeDBSCAN(self):
         if len(threading.enumerate())<2:
@@ -174,21 +174,21 @@ class MiAplicacion(QtGui.QDialog):
             try:
                 eps = float(self.ui.dbscan_eps_line.text())
                 minps = int(self.ui.dbscan_minpts_line.text())
+                print("\nLoading dictionaries and extracting vulnerabilities...")
+                my_years, dictionaries, vuln_list = self.loadData()
+                datalist = vuln_list
+                if self.ui.pca_box.isChecked():
+                    datalist = self.applyPCA(vuln_list)
+                if len(datalist)>0:
+                    t = MyThread('dbscan', [datalist, eps, minps, dictionaries])
+                    t.daemon = True
+                    t.start()
+                else:
+                    print("No vulnerabilities selected")
             except ValueError as err:
                 self.ui.text_window.clear()
                 print(str(err))
                 print("Error in a parameter of DBSCAN, please revise.")
-            print("\nLoading dictionaries and extracting vulnerabilities...")
-            my_years, dictionaries, vuln_list = self.loadData()
-            datalist = vuln_list
-            if self.ui.pca_box.isChecked():
-                datalist = self.applyPCA(vuln_list)
-            if len(datalist)>0:
-                t = MyThread('dbscan', [datalist, eps, minps, dictionaries])
-                t.daemon = True
-                t.start()
-            else:
-                print("No vulnerabilities selected")
 
     def executekNN(self):
         if len(threading.enumerate()) < 2:
@@ -196,23 +196,23 @@ class MiAplicacion(QtGui.QDialog):
             try:
                 n = int(self.ui.knn_n_line.text())
                 perc = float(self.ui.knn_perc_line.text())/100
+                print("\nLoading dictionaries and extracting vulnerabilities...")
+                my_years, dictionaries, vuln_list = self.loadData()
+                train_list, test_list = self.separateData(vuln_list, perc)
+                data_list, validate_list = train_list, test_list
+                if self.ui.pca_box.isChecked():
+                    data_list = self.applyPCA(train_list)
+                    validate_list = self.applyPCA(test_list)
+                if len(data_list)>0:
+                    t = MyThread('knn', [data_list, validate_list, n])
+                    t.daemon = True
+                    t.start()
+                else:
+                    print("No vulnerabilities selected")
             except ValueError as err:
                 self.ui.text_window.clear()
                 print(str(err))
                 print("Error in a parameter of K-nn, please revise.")
-            print("\nLoading dictionaries and extracting vulnerabilities...")
-            my_years, dictionaries, vuln_list = self.loadData()
-            train_list, test_list = self.separateData(vuln_list, perc)
-            data_list, validate_list = train_list, test_list
-            if self.ui.pca_box.isChecked():
-                data_list = self.applyPCA(train_list)
-                validate_list = self.applyPCA(test_list)
-            if len(data_list)>0:
-                t = MyThread('knn', [data_list, validate_list, n])
-                t.daemon = True
-                t.start()
-            else:
-                print("No vulnerabilities selected")
 
     def executeSVM(self):
         if len(threading.enumerate()) < 2:
@@ -223,23 +223,23 @@ class MiAplicacion(QtGui.QDialog):
                 deg = int(self.ui.svm_deg_line.text())
                 kernel = str(self.ui.svm_kernel_box.currentText())
                 perc = float(self.ui.svm_perc_line.text())/100
+                print("\nLoading dictionaries and extracting vulnerabilities...")
+                my_years, dictionaries, vuln_list = self.loadData()
+                train_list, test_list = self.separateData(vuln_list, perc)
+                data_list, validate_list = train_list, test_list
+                if self.ui.pca_box.isChecked():
+                    data_list = self.applyPCA(train_list)
+                    validate_list = self.applyPCA(test_list)
+                if len(data_list) > 0:
+                    t = MyThread('svm', [data_list, validate_list, kernel, gamma, deg, r])
+                    t.daemon = True
+                    t.start()
+                else:
+                    print("No vulnerabilities selected")
             except ValueError as err:
                 self.ui.text_window.clear()
                 print(str(err))
                 print("Error in a parameter of the SVM, please revise.")
-            print("\nLoading dictionaries and extracting vulnerabilities...")
-            my_years, dictionaries, vuln_list = self.loadData()
-            train_list, test_list = self.separateData(vuln_list, perc)
-            data_list, validate_list = train_list, test_list
-            if self.ui.pca_box.isChecked():
-                data_list = self.applyPCA(train_list)
-                validate_list = self.applyPCA(test_list)
-            if len(data_list) > 0:
-                t = MyThread('svm', [data_list, validate_list, kernel, gamma, deg, r])
-                t.daemon = True
-                t.start()
-            else:
-                print("No vulnerabilities selected")
 
 
     def loadData(self):
