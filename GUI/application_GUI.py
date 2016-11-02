@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'test_gui.ui'
 #
@@ -177,7 +178,7 @@ class Ui_Dialog(object):
         self.knn_perc_line.setObjectName(_fromUtf8("knn_perc_line"))
         self.horizontalLayout_12.addWidget(self.knn_perc_line)
         self.knnbutton = QtGui.QPushButton(self.knn_tab)
-        self.knnbutton.setGeometry(QtCore.QRect(130, 160, 91, 31))
+        self.knnbutton.setGeometry(QtCore.QRect(120, 150, 101, 41))
         self.knnbutton.setObjectName(_fromUtf8("knnbutton"))
         self.validateWidget.addTab(self.knn_tab, _fromUtf8(""))
         self.svm_tab = QtGui.QWidget()
@@ -256,7 +257,7 @@ class Ui_Dialog(object):
         self.train_years_tab = QtGui.QWidget()
         self.train_years_tab.setObjectName(_fromUtf8("train_years_tab"))
         self.gridLayoutWidget = QtGui.QWidget(self.train_years_tab)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 151, 201))
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 160, 201))
         self.gridLayoutWidget.setObjectName(_fromUtf8("gridLayoutWidget"))
         self.years_layout = QtGui.QGridLayout(self.gridLayoutWidget)
         self.years_layout.setObjectName(_fromUtf8("years_layout"))
@@ -344,6 +345,9 @@ class Ui_Dialog(object):
         self.threshold_edit_2.setObjectName(_fromUtf8("threshold_edit_2"))
         self.horizontalLayout.addWidget(self.threshold_edit_2)
         self.pca_data_layout.addLayout(self.horizontalLayout)
+        self.pushButton = QtGui.QPushButton(Dialog)
+        self.pushButton.setGeometry(QtCore.QRect(599, 281, 121, 61))
+        self.pushButton.setObjectName(_fromUtf8("pushButton"))
 
         self.retranslateUi(Dialog)
         self.clusterWidget.setCurrentIndex(0)
@@ -421,4 +425,6 @@ class Ui_Dialog(object):
         self.pca_box.setText(_translate("Dialog", "Use PCA", None))
         self.label_2.setText(_translate("Dialog", "Dimension:", None))
         self.label_4.setText(_translate("Dialog", "Threshold:", None))
+        self.pushButton.setText(_translate("Dialog", "Update selected\n"
+"dictionaries", None))
 

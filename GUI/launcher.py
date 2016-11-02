@@ -1,12 +1,12 @@
 from GUI.application_GUI import *
 from random import sample
-from data_types.VulnDictionary import VulnDictionary
 from clustering.kmeans import run_kmeans
 from clustering.hierarchical import run_hierarchical
 from clustering.dbscan import run_dbscan
 from validating.kNN import run_knn
 from validating.svm import run_svm
 from others.pca import pca
+from others.loadAndSave import *
 import sys, threading, pickle
 
 yearsList = []
@@ -63,37 +63,18 @@ class MyThread(threading.Thread):
         if need_to_save:
             threadLock.acquire()
             print("Now saving data to disk")
-            self.saveToDisk(asig, self.params[-1])
+            saveAsignationToDisk(asig, self.params[-1])
             threadLock.release()
 
         print("Completed.")
 
-
-    def saveToDisk(self, asig, dictionary_list):
-        for x in asig:
-            found = False
-            i = 0
-            while ((not found) and (i <= len(dictionary_list))):
-                d = dictionary_list[i]
-                v = d.dict.get(x[0])
-                if v != None:
-                    v.group = x[1]
-                    found = True
-                i = i + 1
-        for d in dictionary_list:
-            try:
-                with open("../dictionaries/VulnDictionary_" + str(d.year) + ".p", 'wb') as f:
-                    pickle.dump(d, f)
-            except IOError as err:
-                print("Error with dictionary " + str(d.year) + " - " + str(err))
-        print("Done!")
 
 
 
 
 class MiAplicacion(QtGui.QDialog):
     def __init__(self, parent=None):
-        sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
+        #sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
         QtGui.QWidget.__init__(self,parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -104,6 +85,7 @@ class MiAplicacion(QtGui.QDialog):
         self.ui.dimension_edit.setDisabled(True)
         self.ui.threshold_edit_2.setDisabled(True)
         QtCore.QObject.connect(self.ui.pca_box, QtCore.SIGNAL('clicked()'), self.checkPCA)
+        QtCore.QObject.connect(self.ui.pushButton, QtCore.SIGNAL('clicked()'), self.updateDictionaries)
         QtCore.QObject.connect(self.ui.checkAllbutton, QtCore.SIGNAL('clicked()'), self.checkAll)
         QtCore.QObject.connect(self.ui.kmeansbutton, QtCore.SIGNAL('clicked()'), self.executeKmeans)
         QtCore.QObject.connect(self.ui.hierarbutton, QtCore.SIGNAL('clicked()'), self.executeHierarch)
@@ -133,6 +115,12 @@ class MiAplicacion(QtGui.QDialog):
         else:
             for year in yearsList:
                 year.setChecked(False)
+
+    def updateDictionaries(self):
+        dict_list = loadDictionaries(self.getSelectedYears())
+        for d in dict_list:
+            d.update()
+        saveDictionariesToDisk(dict_list)
 
 
     def executeKmeans(self):
@@ -241,7 +229,7 @@ class MiAplicacion(QtGui.QDialog):
 
     def loadData(self):
         my_years = self.getSelectedYears()
-        dictionaries = self.getDictionaries(my_years)
+        dictionaries = loadDictionaries(my_years)
         vuln_list = self.getVulnerabilities(dictionaries)
         return my_years, dictionaries, vuln_list
 
