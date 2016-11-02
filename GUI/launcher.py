@@ -139,9 +139,12 @@ class MiAplicacion(QtGui.QDialog):
             datalist = vuln_list
             if self.ui.pca_box.isChecked():
                 datalist = self.applyPCA(vuln_list)
-            t = MyThread('kmeans', [datalist, it, tim, k, dictionaries])
-            t.daemon = True
-            t.start()
+            if len(datalist)>0:
+                t = MyThread('kmeans', [datalist, it, tim, k, dictionaries])
+                t.daemon = True
+                t.start()
+            else:
+                print("No vulnerabilities selected")
 
     def executeHierarch(self):
         if len(threading.enumerate())<2:
@@ -158,9 +161,12 @@ class MiAplicacion(QtGui.QDialog):
             datalist = vuln_list
             if self.ui.pca_box.isChecked():
                 datalist = self.applyPCA(vuln_list)
-            t = MyThread('hierarch', [datalist, max_d, link, dictionaries])
-            t.daemon = True
-            t.start()
+            if len(datalist) > 0:
+                t = MyThread('hierarch', [datalist, max_d, link, dictionaries])
+                t.daemon = True
+                t.start()
+            else:
+                print("No vulnerabilities selected")
 
     def executeDBSCAN(self):
         if len(threading.enumerate())<2:
@@ -177,9 +183,12 @@ class MiAplicacion(QtGui.QDialog):
             datalist = vuln_list
             if self.ui.pca_box.isChecked():
                 datalist = self.applyPCA(vuln_list)
-            t = MyThread('dbscan', [datalist, eps, minps, dictionaries])
-            t.daemon = True
-            t.start()
+            if len(datalist)>0:
+                t = MyThread('dbscan', [datalist, eps, minps, dictionaries])
+                t.daemon = True
+                t.start()
+            else:
+                print("No vulnerabilities selected")
 
     def executekNN(self):
         if len(threading.enumerate()) < 2:
@@ -198,9 +207,12 @@ class MiAplicacion(QtGui.QDialog):
             if self.ui.pca_box.isChecked():
                 data_list = self.applyPCA(train_list)
                 validate_list = self.applyPCA(test_list)
-            t = MyThread('knn', [data_list, validate_list, n])
-            t.daemon = True
-            t.start()
+            if len(data_list)>0:
+                t = MyThread('knn', [data_list, validate_list, n])
+                t.daemon = True
+                t.start()
+            else:
+                print("No vulnerabilities selected")
 
     def executeSVM(self):
         if len(threading.enumerate()) < 2:
@@ -222,9 +234,12 @@ class MiAplicacion(QtGui.QDialog):
             if self.ui.pca_box.isChecked():
                 data_list = self.applyPCA(train_list)
                 validate_list = self.applyPCA(test_list)
-            t = MyThread('svm', [data_list, validate_list, kernel, gamma, deg, r])
-            t.daemon = True
-            t.start()
+            if len(data_list) > 0:
+                t = MyThread('svm', [data_list, validate_list, kernel, gamma, deg, r])
+                t.daemon = True
+                t.start()
+            else:
+                print("No vulnerabilities selected")
 
 
     def loadData(self):
