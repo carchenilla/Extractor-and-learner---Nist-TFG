@@ -5,6 +5,7 @@ from clustering.kmeans import run_kmeans
 from clustering.hierarchical import run_hierarchical
 from clustering.dbscan import run_dbscan
 from validating.kNN import run_knn
+from validating.svm import run_svm
 from others.pca import pca
 import sys, threading, pickle
 
@@ -53,9 +54,8 @@ class MyThread(threading.Thread):
             need_to_save = False
             threadLock.release()
         elif self.algo=='svm':
-            r = self.params[5]
             threadLock.acquire()
-            asig = run_knn(datalist, self.params[1], self.params[2], self.params[3], self.params[4], self.params[5])
+            asig = run_svm(datalist, self.params[1], self.params[2], self.params[3], self.params[4], self.params[5])
             need_to_save = False
             threadLock.release()
 
@@ -210,7 +210,7 @@ class MiAplicacion(QtGui.QDialog):
             if self.ui.pca_box.isChecked():
                 data_list = self.applyPCA(train_list)
                 validate_list = self.applyPCA(test_list)
-            t = MyThread('knn', [data_list, validate_list, n, dictionaries])
+            t = MyThread('knn', [data_list, validate_list, n])
             t.daemon = True
             t.start()
 
@@ -219,7 +219,7 @@ class MiAplicacion(QtGui.QDialog):
             self.ui.text_window.clear()
             try:
                 gamma = float(self.ui.svm_gamma_line.text())
-                r = int(self.ui.svm_r_line.text())
+                r = float(self.ui.svm_r_line.text())
                 deg = int(self.ui.svm_deg_line.text())
                 kernel = str(self.ui.svm_kernel_box.currentText())
                 perc = float(self.ui.svm_perc_line.text())/100
@@ -234,7 +234,7 @@ class MiAplicacion(QtGui.QDialog):
             if self.ui.pca_box.isChecked():
                 data_list = self.applyPCA(train_list)
                 validate_list = self.applyPCA(test_list)
-            t = MyThread('svm', [data_list, validate_list, kernel, gamma, deg, r, dictionaries])
+            t = MyThread('svm', [data_list, validate_list, kernel, gamma, deg, r])
             t.daemon = True
             t.start()
 
@@ -293,7 +293,7 @@ class MiAplicacion(QtGui.QDialog):
 
 
     def separateData(self, datalist, perc):
-        positions = sample(range(len(datalist)), int(perc * (len(datalist))))
+        positions = sample(range(len(datalist)), int((1-perc) * (len(datalist))))
 
         train_list = []
         test_list = []
@@ -302,6 +302,7 @@ class MiAplicacion(QtGui.QDialog):
                 test_list.append(datalist[i])
             elif ((not (i in positions)) and (datalist[i].group != -1)):
                 train_list.append(datalist[i])
+        print("Training with: "+str(len(train_list))+" samples  --  Testing with: "+str(len(test_list))+" samples")
         return train_list, test_list
 
 

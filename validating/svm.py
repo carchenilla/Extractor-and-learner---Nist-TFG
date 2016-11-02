@@ -5,8 +5,8 @@ def run_svm(datalist, testlist, kernel=None, gamma = 0.125, deg = 1, r = 0):
     Y = [x.group for x in datalist]
 
     if kernel != None:
-        clf = svm.SVC(kernel=kernel, gamma=gamma, deg=deg, r=r)
-        s = str(kernel)+" kernel with "+str(gamma)+" = "+str(gamma)+", "+str(deg)+", "+str(r)
+        clf = svm.SVC(kernel=kernel, gamma=gamma, degree=deg, coef0=r)
+        s = str(kernel)+" kernel with gamma = "+str(gamma)+", degree = "+str(deg)+", coef0 = "+str(r)
     else:
         clf = svm.SVC(kernel='linear')
         s = "linear kernel."
