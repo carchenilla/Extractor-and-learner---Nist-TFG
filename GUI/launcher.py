@@ -74,7 +74,7 @@ class MyThread(threading.Thread):
 
 class MiAplicacion(QtGui.QDialog):
     def __init__(self, parent=None):
-        #sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
+        sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
         QtGui.QWidget.__init__(self,parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)

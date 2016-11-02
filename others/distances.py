@@ -12,7 +12,6 @@ def cosine_distance(v, w):
             else:
                 x[i] = 1
                 y[i] = 1
-    print(linalg.norm(x)*linalg.norm(y))
     return 1-(dot(x,y)/(linalg.norm(x)*linalg.norm(y)))
 
 
