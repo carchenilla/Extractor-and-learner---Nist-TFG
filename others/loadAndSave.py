@@ -20,12 +20,12 @@ def loadDictionaries(list_of_years):
     dictionary_list = []
     for i in list_of_years:
         try:
-            with open("../dictionaries/VulnDictionary_" + str(i).strip('~') + ".p", 'rb') as f:
+            with open("../dictionaries/VulnDictionary_" + str(i)+ ".p", 'rb') as f:
                 dictionary_list.append(pickle.load(f))
         except IOError as err:
             print("Error with dictionary " + str(i) + " - " + str(err))
             print("Creating dictionary from scratch")
-            dictionary_list.append(VulnDictionary(i).update())
+            dictionary_list.append(VulnDictionary(i))
     return dictionary_list
 
 

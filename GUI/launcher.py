@@ -76,7 +76,7 @@ class MiAplicacion(QtGui.QDialog):
     def __init__(self, parent=None):
         sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
         QtGui.QWidget.__init__(self,parent)
-        self.ui = Ui_Dialog()
+        self.ui = Ui_TFG()
         self.ui.setupUi(self)
         self.ui.text_window.clear()
         yearsList.extend([self.ui.check2002, self.ui.check2003, self.ui.check2004, self.ui.check2005, self.ui.check2006,
@@ -253,21 +253,8 @@ class MiAplicacion(QtGui.QDialog):
         result = []
         for year in yearsList:
             if year.isChecked():
-                result.append(str(year.text()))
+                result.append(str(year.text()).strip("~"))
         return result
-
-
-    def getDictionaries(self, list_of_years):
-        dictionary_list = []
-        for i in list_of_years:
-            try:
-                with open("../dictionaries/VulnDictionary_" + str(i).strip('~') + ".p", 'rb') as f:
-                    dictionary_list.append(pickle.load(f))
-            except IOError as err:
-                print("Error with dictionary " + str(i) + " - " + str(err))
-                print("Creating dictionary from scratch")
-                dictionary_list.append(VulnDictionary(i).update())
-        return dictionary_list
 
 
     def getVulnerabilities(self, dictionary_list):
