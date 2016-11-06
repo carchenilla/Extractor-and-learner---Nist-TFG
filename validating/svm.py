@@ -3,7 +3,8 @@ from sklearn import svm
 def run_svm(datalist, testlist, kernel=None, gamma = 0.125, deg = 1, r = 0):
     X = [x.vector for x in datalist]
     Y = [x.group for x in datalist]
-
+    true = []
+    predicted = []
     if kernel != None:
         clf = svm.SVC(kernel=kernel, gamma=gamma, degree=deg, coef0=r)
         s = str(kernel)+" kernel with gamma = "+str(gamma)+", degree = "+str(deg)+", coef0 = "+str(r)
@@ -24,6 +25,11 @@ def run_svm(datalist, testlist, kernel=None, gamma = 0.125, deg = 1, r = 0):
             right = right + 1
         else:
             fail = fail + 1
+        true.append(v.group)
+        predicted.append(res[0])
 
-    print("Ratio of success: "+str(right/(right+fail)))
-    return right/(right+fail)
+    if not -1 in true:
+        print("Ratio of success: "+str(right/(right+fail)))
+    classes = list(range(min(true), max(true)+1))
+
+    return (classes, true, predicted)

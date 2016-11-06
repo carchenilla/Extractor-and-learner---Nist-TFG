@@ -14,9 +14,5 @@ class Vulnerability():
         self.group = -1
 
     def to_string(self):
-        aux = ""
-        for s in self.soft_list:
-            aux = aux + str(s.name)+", "
-        soft = aux.strip(" ").strip(",")
         return "Vulnerability: "+self.name+". Published on "+str(self.published)+". \n"+"Score: "+str(self.score)+". Vector: "\
-               +str(self.vector)+"\n"+"Afects software: "+soft+"\n"+self.description+"\n \n"
+               +str(self.vector)+"\n"+self.description+"\n"

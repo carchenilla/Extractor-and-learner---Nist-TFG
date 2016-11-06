@@ -1,5 +1,7 @@
-from GUI.application_GUI import *
+from GUI.designer_application_GUI import *
+from sklearn.metrics import confusion_matrix
 from random import sample
+from PyQt4.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 from clustering.kmeans import run_kmeans
 from clustering.hierarchical import run_hierarchical
 from clustering.dbscan import run_dbscan
@@ -7,7 +9,7 @@ from validating.kNN import run_knn
 from validating.svm import run_svm
 from others.pca import pca
 from others.loadAndSave import *
-import sys, threading, pickle
+import sys, threading, itertools, numpy as np, matplotlib.pyplot as plt
 
 yearsList = []
 threadLock = threading.Lock()
@@ -22,60 +24,81 @@ class EmittingStream(QtCore.QObject):
         pass
 
 
+class AlgorithmWorker(QObject):
+
+    taskDone = pyqtSignal()
+
+    def __init__(self, parent):
+        QObject.__init__(self)
+        parent.newTask.connect(self.execute)
 
 
-class MyThread(threading.Thread):
-    def __init__(self, algo, params):
-        threading.Thread.__init__(self)
-        self.algo = algo
-        self.params = params
-
-    def run(self):
-        need_to_save = False
-        datalist = self.params[0]
-        if self.algo=='kmeans':
+    @pyqtSlot(object)
+    def execute(self, arguments):
+        algo = arguments[0]
+        params = arguments[1]
+        save_classification = False
+        save_validation = False
+        datalist = params[0]
+        if algo == 'kmeans':
             threadLock.acquire()
-            (cost, asig) = run_kmeans(datalist, self.params[1], self.params[2], self.params[3])
-            need_to_save = True
+            (cost, asig) = run_kmeans(datalist, params[1], params[2], params[3])
+            save_classification = True
             threadLock.release()
-        elif self.algo=='hierarch':
+        elif algo == 'hierarch':
             threadLock.acquire()
-            asig = run_hierarchical(datalist, self.params[1], self.params[2])
-            need_to_save = True
+            asig = run_hierarchical(datalist, params[1], params[2])
+            save_classification = True
             threadLock.release()
-        elif self.algo=='dbscan':
+        elif algo == 'dbscan':
             threadLock.acquire()
-            asig = run_dbscan(datalist, self.params[1], self.params[2])
-            need_to_save = True
+            asig = run_dbscan(datalist, params[1], params[2])
+            save_classification = True
             threadLock.release()
-        elif self.algo=='knn':
+        elif algo == 'knn':
             threadLock.acquire()
-            asig = run_knn(datalist, self.params[1], self.params[2])
-            need_to_save = False
+            valid = run_knn(datalist, params[1], params[2])
+            save_validation = True
             threadLock.release()
-        elif self.algo=='svm':
+        elif algo == 'svm':
             threadLock.acquire()
-            asig = run_svm(datalist, self.params[1], self.params[2], self.params[3], self.params[4], self.params[5])
-            need_to_save = False
+            valid = run_svm(datalist, params[1], params[2], params[3], params[4], params[5])
+            save_validation = True
             threadLock.release()
 
         print("Done!")
-        if need_to_save:
+        if save_classification:
             threadLock.acquire()
             print("Now saving data to disk")
-            saveAsignationToDisk(asig, self.params[-1])
+            saveAsignationToDisk(asig, params[-1])
             threadLock.release()
+        elif save_validation:
+            threadLock.acquire()
+            saveValidationToDisk(valid[0], valid[1], valid[2])
+            threadLock.release()
+            self.taskDone.emit()
 
         print("Completed.")
 
-
-
+    @QtCore.pyqtSlot()
+    def start(self):
+        print("[%s] start()" % QtCore.QThread.currentThread().objectName())
 
 
 class MiAplicacion(QtGui.QDialog):
+
+    newTask = pyqtSignal(object)
+
     def __init__(self, parent=None):
         sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
         QtGui.QWidget.__init__(self,parent)
+        self.worker = AlgorithmWorker(self)
+        self.thread = QThread(self, objectName="worker_thread")
+        self.worker.moveToThread(self.thread)
+        self.worker.taskDone.connect(self.plotConfusionMatrix)
+        self.thread.started.connect(self.worker.start)
+        self.thread.daemon = True
+        self.thread.start()
         self.ui = Ui_TFG()
         self.ui.setupUi(self)
         self.ui.text_window.clear()
@@ -136,9 +159,7 @@ class MiAplicacion(QtGui.QDialog):
                 if self.ui.pca_box.isChecked():
                     datalist = self.applyPCA(vuln_list)
                 if len(datalist)>0:
-                    t = MyThread('kmeans', [datalist, it, tim, k, dictionaries])
-                    t.daemon = True
-                    t.start()
+                    self.newTask.emit(('kmeans', [datalist, it, tim, k, dictionaries]))
                 else:
                     print("No vulnerabilities selected")
             except ValueError as err:
@@ -158,9 +179,7 @@ class MiAplicacion(QtGui.QDialog):
                 if self.ui.pca_box.isChecked():
                     datalist = self.applyPCA(vuln_list)
                 if len(datalist) > 0:
-                    t = MyThread('hierarch', [datalist, max_d, link, dictionaries])
-                    t.daemon = True
-                    t.start()
+                    self.newTask.emit(('hierarch', [datalist, max_d, link, dictionaries]))
                 else:
                     print("No vulnerabilities selected")
             except ValueError as err:
@@ -180,9 +199,7 @@ class MiAplicacion(QtGui.QDialog):
                 if self.ui.pca_box.isChecked():
                     datalist = self.applyPCA(vuln_list)
                 if len(datalist)>0:
-                    t = MyThread('dbscan', [datalist, eps, minps, dictionaries])
-                    t.daemon = True
-                    t.start()
+                    self.newTask.emit(('dbscan', [datalist, eps, minps, dictionaries]))
                 else:
                     print("No vulnerabilities selected")
             except ValueError as err:
@@ -204,15 +221,14 @@ class MiAplicacion(QtGui.QDialog):
                     data_list = self.applyPCA(train_list)
                     validate_list = self.applyPCA(test_list)
                 if len(data_list)>0:
-                    t = MyThread('knn', [data_list, validate_list, n])
-                    t.daemon = True
-                    t.start()
+                    self.newTask.emit(('knn', [data_list, validate_list, n]))
                 else:
                     print("No vulnerabilities selected")
             except ValueError as err:
                 self.ui.text_window.clear()
                 print(str(err))
                 print("Error in a parameter of K-nn, please revise.")
+
 
     def executeSVM(self):
         if len(threading.enumerate()) < 2:
@@ -231,9 +247,7 @@ class MiAplicacion(QtGui.QDialog):
                     data_list = self.applyPCA(train_list)
                     validate_list = self.applyPCA(test_list)
                 if len(data_list) > 0:
-                    t = MyThread('svm', [data_list, validate_list, kernel, gamma, deg, r])
-                    t.daemon = True
-                    t.start()
+                    self.newTask.emit(('svm', [data_list, validate_list, kernel, gamma, deg, r]))
                 else:
                     print("No vulnerabilities selected")
             except ValueError as err:
@@ -296,6 +310,27 @@ class MiAplicacion(QtGui.QDialog):
         return train_list, test_list
 
 
+    def plotConfusionMatrix(self):
+        classes, true, predicted = loadValidationFromDisk()
+        cnf = confusion_matrix(true, predicted, labels=classes)
+        plt.imshow(cnf, interpolation='nearest', cmap=plt.cm.Blues)
+        plt.title("Confusion matrix")
+        plt.colorbar()
+        marks = np.arange(len(classes))
+        plt.xticks(marks, classes, rotation=45)
+        plt.yticks(marks, classes)
+        threshold = cnf.max() / 2
+        for i, j in itertools.product(range(cnf.shape[0]), range(cnf.shape[1])):
+            plt.text(j, i, cnf[i, j],
+                     horizontalalignment="center",
+                     color="white" if cnf[i, j] > threshold else "black")
+
+        plt.tight_layout()
+        plt.ylabel('True label')
+        plt.xlabel('Predicted label')
+        plt.show()
+
+
     def normalOutputWritten(self, text):
         self.ui.text_window.append(text.strip("\n"))
 
@@ -303,6 +338,7 @@ class MiAplicacion(QtGui.QDialog):
 
 if __name__=="__main__":
     app = QtGui.QApplication(sys.argv)
+    QThread.currentThread().setObjectName("main")
     my_app = MiAplicacion()
     my_app.show()
     sys.exit(app.exec_())

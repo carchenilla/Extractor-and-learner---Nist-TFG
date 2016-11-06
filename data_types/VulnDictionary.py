@@ -50,49 +50,59 @@ class VulnDictionary:
 
     def update(self):
         if not self.is_updated():
-            self.dict = {}
             name = "nvdcve-"+str(self.year)+".xml.zip"
             urlretrieve("https://nvd.nist.gov/download/"+name,name)
             zipfile.ZipFile(name).extractall()
             os.remove(name)
-
-            root = ET.parse(name[:-4]).getroot()
-            for child in root:
-                try:
-                    if child.get("reject")!="1":
-                        vname = child.attrib['name']
-                        pub_date = child.attrib['published'].split('-')
-                        mod_date = child.attrib['modified'].split('-')
-                        score = float(child.attrib['CVSS_score'])
-                        bas_score = float(child.attrib['CVSS_base_score'])
-                        imp_score = float(child.attrib['CVSS_impact_subscore'])
-                        exp_score = float(child.attrib['CVSS_exploit_subscore'])
-                        # vect = self.extract_vector(child.attrib['CVSS_vector'])
-                        vect = [bas_score, imp_score, exp_score]
-                        vect. extend(self.extract_vector(child.attrib['CVSS_vector']))
-                        descr = child[0][0].text
-                        try:
-                            soft_list = self.extract_software(child[4])
-                        except IndexError as err:
-                            print("\nError with vulnerability "+vname)
-                            print("No software list found \n")
-                            soft_list = []
-                        '''self.dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]), int(pub_date[2])),
-                                                        datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])),
-                                                        sev, score, bas_score, imp_score, exp_score, vect, descr, soft_list)'''
-                        self.dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]), int(pub_date[2])),
-                            datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])), score, array(vect, dtype=float32),
-                                                         descr, soft_list)
-                        print("Saved vulnerability: "+vname)
-                except KeyError:
-                    print("There's a problem with vulnerability "+child.attrib['name'])
-            os.remove(name[:-4])
+            name = name[:-4]
+            self.parseXML(name)
             self.set_last_mod_today()
             print(str(self.year) + " dictionary updated")
             return 1
         else:
             print(str(self.year)+" dictionary is up to date")
             return 0
+
+
+    def parseXML(self, filename):
+        root = ET.parse(filename).getroot()
+        my_dict = {}
+        for child in root:
+            try:
+                if child.get("reject") != "1":
+                    vname = child.attrib['name']
+                    pub_date = child.attrib['published'].split('-')
+                    mod_date = child.attrib['modified'].split('-')
+                    score = float(child.attrib['CVSS_score'])
+                    bas_score = float(child.attrib['CVSS_base_score'])
+                    imp_score = float(child.attrib['CVSS_impact_subscore'])
+                    exp_score = float(child.attrib['CVSS_exploit_subscore'])
+                    # vect = self.extract_vector(child.attrib['CVSS_vector'])
+                    vect = [bas_score, imp_score, exp_score]
+                    vect.extend(self.extract_vector(child.attrib['CVSS_vector']))
+                    descr = child[0][0].text
+                    try:
+                        soft_list = self.extract_software(child[4])
+                    except IndexError as err:
+                        print("\nError with vulnerability " + vname)
+                        print("No software list found \n")
+                        soft_list = []
+                    '''self.dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]), int(pub_date[2])),
+                                                    datetime.date(int(mod_date[0]), int(mod_date[1]), int(mod_date[2])),
+                                                    sev, score, bas_score, imp_score, exp_score, vect, descr, soft_list)'''
+                    my_dict[vname] = Vulnerability(vname, datetime.date(int(pub_date[0]), int(pub_date[1]),
+                                                                          int(pub_date[2])),
+                                                     datetime.date(int(mod_date[0]), int(mod_date[1]),
+                                                                   int(mod_date[2])), score, array(vect, dtype=float32),
+                                                     descr, soft_list)
+                    if self.year!=None:
+                        print("Saved vulnerability: " + vname)
+            except KeyError:
+                print("There's a problem with vulnerability " + child.attrib['name'])
+        if self.year!=None:
+            os.remove(filename)
+        self.dict = my_dict
+
 
 
     def extract_vector(self, initialVector):

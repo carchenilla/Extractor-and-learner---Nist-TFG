@@ -1,4 +1,4 @@
-import pickle
+import pickle, os
 from data_types.VulnDictionary import VulnDictionary
 
 
@@ -37,3 +37,21 @@ def saveDictionariesToDisk(dictionary_list):
         except IOError as err:
             print("Error with dictionary " + str(d.year) + " - " + str(err))
     print("Done!")
+
+
+def saveValidationToDisk(classes, true_list, predict_list):
+    try:
+        with open("../GUI/valid_results.p", 'wb') as f:
+            pickle.dump((classes, true_list, predict_list), f)
+    except IOError as err:
+        print("Error when saving validation results for plot --- " + str(err))
+
+
+def loadValidationFromDisk():
+    try:
+        with open("../GUI/valid_results.p", 'rb') as f:
+            (classes, true, predicted) = pickle.load(f)
+        os.remove("../GUI/valid_results.p")
+        return classes, true, predicted
+    except IOError as err:
+        print("Error when loading validation results for plot --- " + str(err))
