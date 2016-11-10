@@ -14,5 +14,5 @@ class Vulnerability():
         self.group = -1
 
     def to_string(self):
-        return "Vulnerability: "+self.name+". Published on "+str(self.published)+". \n"+"Score: "+str(self.score)+". Vector: "\
-               +str(self.vector)+"\n"+self.description+"\n"
+        return "Vulnerability: "+self.name+"\nPublished on "+str(self.published)+"\nScore: "+str(self.score)+\
+               "\nVector: "+str(self.vector)+"\n"+self.description+"\n"

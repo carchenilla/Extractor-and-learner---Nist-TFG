@@ -37,10 +37,6 @@ if __name__ == "__main__":
 
     vulnerability_list = load_vulnerabilities()
 
-    for v in vulnerability_list:
-        for s in v.soft_list:
-            print(s.name)
-
     program = "windows_10"
 
 
@@ -49,25 +45,13 @@ if __name__ == "__main__":
     for v in vulnerability_list:
         if checkSoft(program, v):
             c2 = c2 +1
-            specific_list.append((v.published, v.score))
+            specific_list.append((v.published, v))
     specific_list.sort(key=lambda tup: tup[0])
     print("Found: "+str(c2))
 
-    begin_date = specific_list[0][0]
-    finish_date = specific_list[-1][0]
-    acumulated_list = []
-    dates_list = []
+    begin_date = date(2016,8,1)
+    finish_date = date(2016,10,1)
 
-    for week in daterange(begin_date, finish_date):
-        counter = 0
-        for tup in specific_list:
-            if week[0] <= tup[0] <= week[1]:
-                counter = counter + 1
-        if counter != 0:
-            acumulated_list.append(counter)
-            dates_list.append(week[1])
-
-    plt.plot(dates_list, acumulated_list, 'b-')
-    plt.ylabel("Nº de vulnerabilidades")
-    plt.title(program)
-    plt.show()
+    for v in specific_list:
+        if begin_date <= v[0] <= finish_date:
+            print(v[1].to_string()+"\n")

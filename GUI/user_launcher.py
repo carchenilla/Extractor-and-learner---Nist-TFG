@@ -72,14 +72,14 @@ class AlgorithmWorker(QObject):
 
         if len(testlist)!=1:
             with open("../vulnerabilities/results-"+str(name)+".txt", 'w') as f:
-                print("Vulnerability " + str(name) + " with vector "+str(list(vector))+" was classified in group "
-                      + str(group)+"\n", file=f)
-                print("Representative vulnerabilities of this group are: ", file=f)
+                print("Vulnerability " + str(name) + "\nwith vector " + str(list(vector)) + "\nwas classified in group "
+                      + str(group) + ".\n\n", file=f)
+                print("Representative vulnerabilities of this group are: ", file = f)
                 print(string, file=f)
         else:
             print("\n\n\n")
-            print("Vulnerability " + str(name) + " with vector " + str(list(vector)) + "\nwas classified in group "
-                  + str(group) + ".\n")
+            print("Vulnerability " + str(name) + "\nwith vector " + str(list(vector)) + "\nwas classified in group "
+                  + str(group) + ".\n\n")
             print("Representative vulnerabilities of this group are: ")
             print(string)
 
