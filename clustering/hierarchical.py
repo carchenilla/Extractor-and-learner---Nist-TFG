@@ -28,11 +28,11 @@ def fancy_dendrogram(*args, **kwargs):
     return ddata
 
 
-def run_hierarchical(datalist, max_d, distance = "ward"):
+def run_hierarchical(datalist, max_d, criteria ="ward"):
     my_list = [(x.name, -1) for x in datalist]
     X = [x.vector for x in datalist]
     print("Training hierarchical for max_d = "+str(max_d)+"...")
-    Z = linkage(X, distance)
+    Z = linkage(X, criteria)
     clusters = fcluster(Z, max_d, criterion="distance")
     for i in range(len(clusters)):
         my_list[i] = (my_list[i][0], clusters[i])
@@ -40,7 +40,7 @@ def run_hierarchical(datalist, max_d, distance = "ward"):
 
 
 
-def run_hierarchical_with_plot(datalist, distance='ward'):
+def run_hierarchical_with_plot(datalist, criteria='ward'):
     my_list = [(x.name, -1) for x in datalist]
     X = [x.vector for x in datalist]
     plot_X = []
@@ -82,7 +82,7 @@ def run_hierarchical_with_plot(datalist, distance='ward'):
         pass
 
     print("Training hierarchical for max_d = " + str(max_d) + "...")
-    Z = linkage(X, distance)
+    Z = linkage(X, criteria)
     clusters = fcluster(Z, max_d, criterion="distance")
 
     for i in range(len(clusters)):

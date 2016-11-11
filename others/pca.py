@@ -4,11 +4,11 @@ from copy import deepcopy
 def pca(datalist, d=None, threshold = 0.99):
     datalist_copy = deepcopy(datalist)
     normalized_list = normalize(datalist_copy)
-    sigma = getSigma(normalized_list)
-    U, s, V = linalg.svd(sigma, full_matrices=True)
+    M = getMatrix(normalized_list)
+    U, sigma, V = linalg.svd(M, full_matrices=True)
     if d==None:
         print("Calculating optimal reduction for "+str(threshold)+" variance retention")
-        d = variance_retention(threshold, s)
+        d = variance_retention(threshold, sigma)
         print("Optimal d = "+str(d))
     print("Now reducing dimensionality to "+str(d))
     new_U = transpose(U[:,:d])
@@ -42,7 +42,7 @@ def normalize(datalist):
     return norm_vuln_list
 
 
-def getSigma(datalist):
+def getMatrix(datalist):
     vl = []
     print("Calculating sigma matrix")
     for v in datalist:

@@ -1,4 +1,5 @@
 from GUI.designer_application_GUI import *
+from numpy import zeros, float32
 from sklearn.metrics import confusion_matrix
 from random import sample
 from PyQt4.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
@@ -312,7 +313,7 @@ class MiAplicacion(QtGui.QDialog):
 
     def plotConfusionMatrix(self):
         classes, true, predicted = loadValidationFromDisk()
-        cnf = confusion_matrix(true, predicted, labels=classes)
+        cnf = self.normalizeMatrix(confusion_matrix(true, predicted, labels=classes))
         plt.imshow(cnf, interpolation='nearest', cmap=plt.cm.Blues)
         plt.title("Confusion matrix")
         plt.colorbar()
@@ -329,6 +330,16 @@ class MiAplicacion(QtGui.QDialog):
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
         plt.show()
+
+
+    def normalizeMatrix(self, m):
+        new_m = zeros((m.shape[0], m.shape[1]), dtype=float32)
+        for i in range(new_m.shape[0]):
+            total = int(sum(list(m[i,:])))
+            print(total)
+            for j in range(new_m.shape[1]):
+                new_m[i,j] = m[i,j]/total
+        return new_m
 
 
     def normalOutputWritten(self, text):
