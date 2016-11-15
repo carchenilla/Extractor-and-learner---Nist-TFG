@@ -68,7 +68,7 @@ def run_kmeans(datalist, iterations=100, times=6, k=4):
         print("\nInitializing k-means no. "+str(i+1))
         (assig_list, cost) = kmeans(datalist, times, k)
         if cost < lowest_cost:
-            print("Lower cost found: "+str(cost))
+            print("Lower distortion found: "+str(cost))
             lowest_cost = cost
             final_assig = assig_list
     return (lowest_cost, final_assig)

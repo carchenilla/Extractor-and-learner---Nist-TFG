@@ -1,4 +1,4 @@
-from GUI.designer_application_GUI import *
+from GUI.train_GUI import *
 from numpy import zeros, float32
 from sklearn.metrics import confusion_matrix
 from random import sample
@@ -83,7 +83,7 @@ class AlgorithmWorker(QObject):
 
     @QtCore.pyqtSlot()
     def start(self):
-        print("[%s] start()" % QtCore.QThread.currentThread().objectName())
+        print("[%s] start()" % QtCore.QThread.currentThread().objectName(), file=sys.stderr)
 
 
 class MiAplicacion(QtGui.QDialog):
@@ -325,7 +325,6 @@ class MiAplicacion(QtGui.QDialog):
             plt.text(j, i, cnf[i, j],
                      horizontalalignment="center",
                      color="white" if cnf[i, j] > threshold else "black")
-
         plt.tight_layout()
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
@@ -336,7 +335,6 @@ class MiAplicacion(QtGui.QDialog):
         new_m = zeros((m.shape[0], m.shape[1]), dtype=float32)
         for i in range(new_m.shape[0]):
             total = int(sum(list(m[i,:])))
-            print(total)
             for j in range(new_m.shape[1]):
                 new_m[i,j] = m[i,j]/total
         return new_m

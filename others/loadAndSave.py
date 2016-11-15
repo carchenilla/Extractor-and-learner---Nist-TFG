@@ -20,7 +20,7 @@ def loadDictionaries(list_of_years):
     dictionary_list = []
     for i in list_of_years:
         try:
-            with open("../dictionaries/VulnDictionary_" + str(i)+ ".p", 'rb') as f:
+            with open("dictionaries/VulnDictionary_" + str(i)+ ".p", 'rb') as f:
                 dictionary_list.append(pickle.load(f))
         except IOError as err:
             print("Error with dictionary " + str(i) + " - " + str(err))
@@ -32,7 +32,7 @@ def loadDictionaries(list_of_years):
 def saveDictionariesToDisk(dictionary_list):
     for d in dictionary_list:
         try:
-            with open("../dictionaries/VulnDictionary_" + str(d.year) + ".p", 'wb') as f:
+            with open("dictionaries/VulnDictionary_" + str(d.year) + ".p", 'wb') as f:
                 pickle.dump(d, f)
         except IOError as err:
             print("Error with dictionary " + str(d.year) + " - " + str(err))
@@ -41,7 +41,7 @@ def saveDictionariesToDisk(dictionary_list):
 
 def saveValidationToDisk(classes, true_list, predict_list):
     try:
-        with open("../GUI/valid_results.p", 'wb') as f:
+        with open("GUI/valid_results.p", 'wb') as f:
             pickle.dump((classes, true_list, predict_list), f)
     except IOError as err:
         print("Error when saving validation results for plot --- " + str(err))
@@ -49,9 +49,9 @@ def saveValidationToDisk(classes, true_list, predict_list):
 
 def loadValidationFromDisk():
     try:
-        with open("../GUI/valid_results.p", 'rb') as f:
+        with open("GUI/valid_results.p", 'rb') as f:
             (classes, true, predicted) = pickle.load(f)
-        os.remove("../GUI/valid_results.p")
+        os.remove("GUI/valid_results.p")
         return classes, true, predicted
     except IOError as err:
         print("Error when loading validation results for plot --- " + str(err))

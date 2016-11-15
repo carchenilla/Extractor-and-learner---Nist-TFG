@@ -1,11 +1,12 @@
-from GUI.user_application_GUI import *
+from GUI.predict_GUI import *
 from data_types.VulnDictionary import *
 from numpy import array, float32
 from PyQt4.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 from validating.kNN import run_knn
 from validating.svm import run_svm
 from others.pca import pca
-from random import sample
+from others.distances import cosine_distance
+from clustering.kmeans import relocate_centroid
 from others.loadAndSave import *
 import sys, threading, datetime
 
@@ -64,11 +65,16 @@ class AlgorithmWorker(QObject):
         my_vulns = [v for v in datalist if v.group==group]
         string = ""
         try:
-            positions = sample(range(len(my_vulns)), 3)
+            centroid = relocate_centroid(my_vulns, [(None, group)]*len(my_vulns), group)
+            aux_list = []
+            for v in my_vulns:
+                aux_list.append((cosine_distance(v.vector, centroid.vector), v))
+            aux_list.sort(key=lambda tup: tup[0])
+            nearest_list = [v for (dist, v) in aux_list[:3]]
         except:
-            positions = list(range(len(my_vulns)))
-        for p in positions:
-            string = string + my_vulns[p].to_string()+"\n"
+            nearest_list = []
+        for p in nearest_list:
+            string = string + p.to_string()+"\n"
 
         if len(testlist)!=1:
             with open("../vulnerabilities/results-"+str(name)+".txt", 'w') as f:
@@ -85,8 +91,7 @@ class AlgorithmWorker(QObject):
 
     @QtCore.pyqtSlot()
     def start(self):
-        print("[%s] start()" % QtCore.QThread.currentThread().objectName())
-
+        print("[%s] start()" % QtCore.QThread.currentThread().objectName(), file=sys.stderr)
 
 class MiAplicacion(QtGui.QDialog):
 
