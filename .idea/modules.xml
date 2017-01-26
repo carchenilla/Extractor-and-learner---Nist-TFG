@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ScraperTFG.iml" filepath="$PROJECT_DIR$/.idea/ScraperTFG.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/TFG-informatica.iml" filepath="$PROJECT_DIR$/.idea/TFG-informatica.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../catchRatioCalculator/.idea/catchRatioCalculator.iml" filepath="$PROJECT_DIR$/../catchRatioCalculator/.idea/catchRatioCalculator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../pruebaDelRuso/.idea/pruebaDelRuso.iml" filepath="$PROJECT_DIR$/../pruebaDelRuso/.idea/pruebaDelRuso.iml" />
     </modules>
   </component>
 </project>

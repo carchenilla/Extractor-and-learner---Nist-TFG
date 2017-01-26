@@ -1,7 +1,8 @@
 from GUI.predict_GUI import *
 from data_types.VulnDictionary import *
 from numpy import array, float32
-from PyQt4.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QDialog, QWidget, QApplication
 from validating.kNN import run_knn
 from validating.svm import run_svm
 from others.pca import pca
@@ -24,8 +25,8 @@ AVAIL_IMPACT = {'None':1, 'Partial':2,'Complete':3}
 FEATURES_LIST = [ACCESS_VECTOR, ACCESS_COMPLEXITY, AUTHENTIFICATION, CONF_IMPACT, INTEG_IMPACT, AVAIL_IMPACT]
 
 
-class EmittingStream(QtCore.QObject):
-    textWritten = QtCore.pyqtSignal(str)
+class EmittingStream(QObject):
+    textWritten = pyqtSignal(str)
 
     def write(self, text):
         self.textWritten.emit(str(text))
@@ -89,17 +90,17 @@ class AlgorithmWorker(QObject):
             print("Representative vulnerabilities of this group are: ")
             print(string)
 
-    @QtCore.pyqtSlot()
+    @pyqtSlot()
     def start(self):
-        print("[%s] start()" % QtCore.QThread.currentThread().objectName(), file=sys.stderr)
+        print("[%s] start()" % QThread.currentThread().objectName(), file=sys.stderr)
 
-class MiAplicacion(QtGui.QDialog):
+class MiAplicacion(QDialog):
 
     newTask = pyqtSignal(object)
 
     def __init__(self, parent=None):
         sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
-        QtGui.QWidget.__init__(self,parent)
+        QWidget.__init__(self,parent)
         self.worker = AlgorithmWorker(self)
         self.thread = QThread(self, objectName="worker_thread")
         self.worker.moveToThread(self.thread)
@@ -117,10 +118,12 @@ class MiAplicacion(QtGui.QDialog):
         self.ui.dimension_edit.setDisabled(True)
         self.ui.threshold_edit_2.setDisabled(True)
         self.ui.fileLoad_button.click()
-        QtCore.QObject.connect(self.ui.pca_box, QtCore.SIGNAL('clicked()'), self.checkPCA)
-        QtCore.QObject.connect(self.ui.checkAllbutton, QtCore.SIGNAL('clicked()'), self.checkAll)
-        QtCore.QObject.connect(self.ui.knnbutton_3, QtCore.SIGNAL('clicked()'), self.executekNN)
-        QtCore.QObject.connect(self.ui.svm_button, QtCore.SIGNAL('clicked()'), self.executeSVM)
+        self.ui.knnbutton_3.clicked.connect(self.executekNN)
+        self.ui.pca_box.clicked.connect(self.checkPCA)
+        self.ui.checkAllbutton.clicked.connect(self.checkAll)
+        self.ui.svm_button.clicked.connect(self.executeSVM)
+
+
 
 
     def checkPCA(self):
@@ -147,56 +150,54 @@ class MiAplicacion(QtGui.QDialog):
 
 
     def executekNN(self):
-        if len(threading.enumerate()) < 2:
+        self.ui.text_window.clear()
+        try:
+            n = int(self.ui.knn_n_line.text())
+            print("\nLoading dictionaries and extracting vulnerabilities...")
+            my_years, dictionaries, vuln_list = self.loadData()
+
+            if self.ui.pca_box.isChecked():
+                data_list = self.applyPCA(vuln_list)
+                test_list = self.applyPCA(self.getTestSubjects())
+            else:
+                data_list = vuln_list
+                test_list = self.getTestSubjects()
+
+            if len(data_list)>0:
+                self.newTask.emit(('knn', [data_list, test_list, n]))
+            else:
+                print("No vulnerabilities selected")
+        except ValueError as err:
             self.ui.text_window.clear()
-            try:
-                n = int(self.ui.knn_n_line.text())
-                print("\nLoading dictionaries and extracting vulnerabilities...")
-                my_years, dictionaries, vuln_list = self.loadData()
-
-                if self.ui.pca_box.isChecked():
-                    data_list = self.applyPCA(vuln_list)
-                    test_list = self.applyPCA(self.getTestSubjects())
-                else:
-                    data_list = vuln_list
-                    test_list = self.getTestSubjects()
-
-                if len(data_list)>0:
-                    self.newTask.emit(('knn', [data_list, test_list, n]))
-                else:
-                    print("No vulnerabilities selected")
-            except ValueError as err:
-                self.ui.text_window.clear()
-                print(str(err))
-                print("Error in a parameter of K-nn, please revise.")
+            print(str(err))
+            print("Error in a parameter of K-nn, please revise.")
 
 
     def executeSVM(self):
-        if len(threading.enumerate()) < 2:
+        self.ui.text_window.clear()
+        try:
+            gamma = float(self.ui.svm_gamma_line.text())
+            r = float(self.ui.svm_r_line.text())
+            deg = int(self.ui.svm_deg_line.text())
+            kernel = str(self.ui.svm_kernel_box.currentText())
+            print("\nLoading dictionaries and extracting vulnerabilities...")
+            my_years, dictionaries, vuln_list = self.loadData()
+
+            if self.ui.pca_box.isChecked():
+                data_list = self.applyPCA(vuln_list)
+                test_list = self.applyPCA(self.getTestSubjects())
+            else:
+                data_list = vuln_list
+                test_list = self.getTestSubjects()
+
+            if len(data_list) > 0:
+                self.newTask.emit(('svm', [data_list, test_list, kernel, gamma, deg, r]))
+            else:
+                print("No vulnerabilities selected")
+        except ValueError as err:
             self.ui.text_window.clear()
-            try:
-                gamma = float(self.ui.svm_gamma_line.text())
-                r = float(self.ui.svm_r_line.text())
-                deg = int(self.ui.svm_deg_line.text())
-                kernel = str(self.ui.svm_kernel_box.currentText())
-                print("\nLoading dictionaries and extracting vulnerabilities...")
-                my_years, dictionaries, vuln_list = self.loadData()
-
-                if self.ui.pca_box.isChecked():
-                    data_list = self.applyPCA(vuln_list)
-                    test_list = self.applyPCA(self.getTestSubjects())
-                else:
-                    data_list = vuln_list
-                    test_list = self.getTestSubjects()
-
-                if len(data_list) > 0:
-                    self.newTask.emit(('svm', [data_list, test_list, kernel, gamma, deg, r]))
-                else:
-                    print("No vulnerabilities selected")
-            except ValueError as err:
-                self.ui.text_window.clear()
-                print(str(err))
-                print("Error in a parameter of the SVM, please revise.")
+            print(str(err))
+            print("Error in a parameter of the SVM, please revise.")
 
 
     def getTestSubjects(self):
@@ -276,7 +277,7 @@ class MiAplicacion(QtGui.QDialog):
 
 
 if __name__=="__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     QThread.currentThread().setObjectName("main")
     my_app = MiAplicacion()
     my_app.show()

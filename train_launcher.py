@@ -2,7 +2,8 @@ from GUI.train_GUI import *
 from numpy import zeros, float32
 from sklearn.metrics import confusion_matrix
 from random import sample
-from PyQt4.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QDialog, QWidget, QApplication
 from clustering.kmeans import run_kmeans
 from clustering.hierarchical import run_hierarchical
 from clustering.dbscan import run_dbscan
@@ -81,18 +82,18 @@ class AlgorithmWorker(QObject):
 
         print("Completed.")
 
-    @QtCore.pyqtSlot()
+    @pyqtSlot()
     def start(self):
         print("[%s] start()" % QtCore.QThread.currentThread().objectName(), file=sys.stderr)
 
 
-class MiAplicacion(QtGui.QDialog):
+class MiAplicacion(QDialog):
 
     newTask = pyqtSignal(object)
 
     def __init__(self, parent=None):
         sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
-        QtGui.QWidget.__init__(self,parent)
+        QWidget.__init__(self,parent)
         self.worker = AlgorithmWorker(self)
         self.thread = QThread(self, objectName="worker_thread")
         self.worker.moveToThread(self.thread)
@@ -108,14 +109,14 @@ class MiAplicacion(QtGui.QDialog):
                      self.ui.check2012, self.ui.check2013, self.ui.check2014, self.ui.check2015, self.ui.check2016])
         self.ui.dimension_edit.setDisabled(True)
         self.ui.threshold_edit_2.setDisabled(True)
-        QtCore.QObject.connect(self.ui.pca_box, QtCore.SIGNAL('clicked()'), self.checkPCA)
-        QtCore.QObject.connect(self.ui.pushButton, QtCore.SIGNAL('clicked()'), self.updateDictionaries)
-        QtCore.QObject.connect(self.ui.checkAllbutton, QtCore.SIGNAL('clicked()'), self.checkAll)
-        QtCore.QObject.connect(self.ui.kmeansbutton, QtCore.SIGNAL('clicked()'), self.executeKmeans)
-        QtCore.QObject.connect(self.ui.hierarbutton, QtCore.SIGNAL('clicked()'), self.executeHierarch)
-        QtCore.QObject.connect(self.ui.dbscanbutton, QtCore.SIGNAL('clicked()'), self.executeDBSCAN)
-        QtCore.QObject.connect(self.ui.knnbutton, QtCore.SIGNAL('clicked()'), self.executekNN)
-        QtCore.QObject.connect(self.ui.svm_button, QtCore.SIGNAL('clicked()'), self.executeSVM)
+        self.ui.knnbutton.clicked.connect(self.executekNN)
+        self.ui.pca_box.clicked.connect(self.checkPCA)
+        self.ui.checkAllbutton.clicked.connect(self.checkAll)
+        self.ui.svm_button.clicked.connect(self.executeSVM)
+        self.ui.pushButton.clicked.connect(self.updateDictionaries)
+        self.ui.kmeansbutton.clicked.connect(self.executeKmeans)
+        self.ui.hierarbutton.clicked.connect(self.executeHierarch)
+        self.ui.dbscanbutton.clicked.connect(self.executeDBSCAN)
 
 
     def checkPCA(self):
@@ -148,113 +149,108 @@ class MiAplicacion(QtGui.QDialog):
 
 
     def executeKmeans(self):
-        if len(threading.enumerate())<2:
+        self.ui.text_window.clear()
+        try:
+            it = int(self.ui.kmeans_iters_line.text())
+            tim = int(self.ui.kmeans_times_line.text())
+            k = int(self.ui.kmeans_k_line.text())
+            print("\nLoading dictionaries and extracting vulnerabilities...")
+            my_years, dictionaries, vuln_list = self.loadData()
+            datalist = vuln_list
+            if self.ui.pca_box.isChecked():
+                datalist = self.applyPCA(vuln_list)
+            if len(datalist)>0:
+                self.newTask.emit(('kmeans', [datalist, it, tim, k, dictionaries]))
+            else:
+                print("No vulnerabilities selected")
+        except ValueError as err:
             self.ui.text_window.clear()
-            try:
-                it = int(self.ui.kmeans_iters_line.text())
-                tim = int(self.ui.kmeans_times_line.text())
-                k = int(self.ui.kmeans_k_line.text())
-                print("\nLoading dictionaries and extracting vulnerabilities...")
-                my_years, dictionaries, vuln_list = self.loadData()
-                datalist = vuln_list
-                if self.ui.pca_box.isChecked():
-                    datalist = self.applyPCA(vuln_list)
-                if len(datalist)>0:
-                    self.newTask.emit(('kmeans', [datalist, it, tim, k, dictionaries]))
-                else:
-                    print("No vulnerabilities selected")
-            except ValueError as err:
-                self.ui.text_window.clear()
-                print(str(err))
-                print("Error in a parameter of K-means, please revise.")
+            print(str(err))
+            print("Error in a parameter of K-means, please revise.")
 
     def executeHierarch(self):
-        if len(threading.enumerate())<2:
+        self.ui.text_window.clear()
+        try:
+            max_d = int(self.ui.hier_maxd_line.text())
+            link = str(self.ui.hier_linkage_box.currentText())
+            print("\nLoading dictionaries and extracting vulnerabilities...")
+            my_years, dictionaries, vuln_list = self.loadData()
+            datalist = vuln_list
+            if self.ui.pca_box.isChecked():
+                datalist = self.applyPCA(vuln_list)
+            if len(datalist) > 0:
+                self.newTask.emit(('hierarch', [datalist, max_d, link, dictionaries]))
+            else:
+                print("No vulnerabilities selected")
+        except ValueError as err:
             self.ui.text_window.clear()
-            try:
-                max_d = int(self.ui.hier_maxd_line.text())
-                link = str(self.ui.hier_linkage_box.currentText())
-                print("\nLoading dictionaries and extracting vulnerabilities...")
-                my_years, dictionaries, vuln_list = self.loadData()
-                datalist = vuln_list
-                if self.ui.pca_box.isChecked():
-                    datalist = self.applyPCA(vuln_list)
-                if len(datalist) > 0:
-                    self.newTask.emit(('hierarch', [datalist, max_d, link, dictionaries]))
-                else:
-                    print("No vulnerabilities selected")
-            except ValueError as err:
-                self.ui.text_window.clear()
-                print(str(err))
-                print("Error in a parameter of Hierarchical, please revise.")
+            print(str(err))
+            print("Error in a parameter of Hierarchical, please revise.")
 
     def executeDBSCAN(self):
-        if len(threading.enumerate())<2:
+        self.ui.text_window.clear()
+        try:
+            eps = float(self.ui.dbscan_eps_line.text())
+            minps = int(self.ui.dbscan_minpts_line.text())
+            print("\nLoading dictionaries and extracting vulnerabilities...")
+            my_years, dictionaries, vuln_list = self.loadData()
+            datalist = vuln_list
+            if self.ui.pca_box.isChecked():
+                datalist = self.applyPCA(vuln_list)
+            if len(datalist)>0:
+                self.newTask.emit(('dbscan', [datalist, eps, minps, dictionaries]))
+            else:
+                print("No vulnerabilities selected")
+        except ValueError as err:
             self.ui.text_window.clear()
-            try:
-                eps = float(self.ui.dbscan_eps_line.text())
-                minps = int(self.ui.dbscan_minpts_line.text())
-                print("\nLoading dictionaries and extracting vulnerabilities...")
-                my_years, dictionaries, vuln_list = self.loadData()
-                datalist = vuln_list
-                if self.ui.pca_box.isChecked():
-                    datalist = self.applyPCA(vuln_list)
-                if len(datalist)>0:
-                    self.newTask.emit(('dbscan', [datalist, eps, minps, dictionaries]))
-                else:
-                    print("No vulnerabilities selected")
-            except ValueError as err:
-                self.ui.text_window.clear()
-                print(str(err))
-                print("Error in a parameter of DBSCAN, please revise.")
+            print(str(err))
+            print("Error in a parameter of DBSCAN, please revise.")
 
     def executekNN(self):
-        if len(threading.enumerate()) < 2:
+        self.ui.text_window.clear()
+        try:
+            n = int(self.ui.knn_n_line.text())
+            perc = float(self.ui.knn_perc_line.text())/100
+            print("\nLoading dictionaries and extracting vulnerabilities...")
+            my_years, dictionaries, vuln_list = self.loadData()
+            train_list, test_list = self.separateData(vuln_list, perc)
+            data_list, validate_list = train_list, test_list
+            if self.ui.pca_box.isChecked():
+                data_list = self.applyPCA(train_list)
+                validate_list = self.applyPCA(test_list)
+            if len(data_list)>0:
+                self.newTask.emit(('knn', [data_list, validate_list, n]))
+            else:
+                print("No vulnerabilities selected")
+        except ValueError as err:
             self.ui.text_window.clear()
-            try:
-                n = int(self.ui.knn_n_line.text())
-                perc = float(self.ui.knn_perc_line.text())/100
-                print("\nLoading dictionaries and extracting vulnerabilities...")
-                my_years, dictionaries, vuln_list = self.loadData()
-                train_list, test_list = self.separateData(vuln_list, perc)
-                data_list, validate_list = train_list, test_list
-                if self.ui.pca_box.isChecked():
-                    data_list = self.applyPCA(train_list)
-                    validate_list = self.applyPCA(test_list)
-                if len(data_list)>0:
-                    self.newTask.emit(('knn', [data_list, validate_list, n]))
-                else:
-                    print("No vulnerabilities selected")
-            except ValueError as err:
-                self.ui.text_window.clear()
-                print(str(err))
-                print("Error in a parameter of K-nn, please revise.")
+            print(str(err))
+            print("Error in a parameter of K-nn, please revise.")
 
 
     def executeSVM(self):
-        if len(threading.enumerate()) < 2:
+        self.ui.text_window.clear()
+        try:
+            gamma = float(self.ui.svm_gamma_line.text())
+            r = float(self.ui.svm_r_line.text())
+            deg = int(self.ui.svm_deg_line.text())
+            kernel = str(self.ui.svm_kernel_box.currentText())
+            perc = float(self.ui.svm_perc_line.text())/100
+            print("\nLoading dictionaries and extracting vulnerabilities...")
+            my_years, dictionaries, vuln_list = self.loadData()
+            train_list, test_list = self.separateData(vuln_list, perc)
+            data_list, validate_list = train_list, test_list
+            if self.ui.pca_box.isChecked():
+                data_list = self.applyPCA(train_list)
+                validate_list = self.applyPCA(test_list)
+            if len(data_list) > 0:
+                self.newTask.emit(('svm', [data_list, validate_list, kernel, gamma, deg, r]))
+            else:
+                print("No vulnerabilities selected")
+        except ValueError as err:
             self.ui.text_window.clear()
-            try:
-                gamma = float(self.ui.svm_gamma_line.text())
-                r = float(self.ui.svm_r_line.text())
-                deg = int(self.ui.svm_deg_line.text())
-                kernel = str(self.ui.svm_kernel_box.currentText())
-                perc = float(self.ui.svm_perc_line.text())/100
-                print("\nLoading dictionaries and extracting vulnerabilities...")
-                my_years, dictionaries, vuln_list = self.loadData()
-                train_list, test_list = self.separateData(vuln_list, perc)
-                data_list, validate_list = train_list, test_list
-                if self.ui.pca_box.isChecked():
-                    data_list = self.applyPCA(train_list)
-                    validate_list = self.applyPCA(test_list)
-                if len(data_list) > 0:
-                    self.newTask.emit(('svm', [data_list, validate_list, kernel, gamma, deg, r]))
-                else:
-                    print("No vulnerabilities selected")
-            except ValueError as err:
-                self.ui.text_window.clear()
-                print(str(err))
-                print("Error in a parameter of the SVM, please revise.")
+            print(str(err))
+            print("Error in a parameter of the SVM, please revise.")
 
 
     def loadData(self):
@@ -346,7 +342,7 @@ class MiAplicacion(QtGui.QDialog):
 
 
 if __name__=="__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     QThread.currentThread().setObjectName("main")
     my_app = MiAplicacion()
     my_app.show()
